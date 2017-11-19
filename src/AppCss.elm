@@ -11,5 +11,6 @@ css =
     (stylesheet << namespace "gfr") <|
         List.concat
             [ [ h1 [ color Colors.blue ]
+              , id "map" [ width (pct 100), height (px 500) ]
               ]
             ]
