@@ -32,7 +32,6 @@ init =
     in
         ( { map = map }
         , map
-            |> Map.toJsObject
             |> MapPort.initializeMap
         )
 
@@ -42,7 +41,7 @@ init =
 
 
 type Msg
-    = MapDragged Map.JsObject
+    = MapDragged Map.Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -55,8 +54,8 @@ update msg model =
 
                 newMap =
                     { oldMap
-                        | latitude = pos.lat
-                        , longitude = pos.lng
+                        | latitude = pos.latitude
+                        , longitude = pos.longitude
                         , zoom = pos.zoom
                     }
             in
