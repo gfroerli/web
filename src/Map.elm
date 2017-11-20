@@ -4,7 +4,7 @@ module Map exposing (Model, JsObject, init, toJsObject, fromJsObject)
 type alias Model =
     { latitude : Float
     , longitude : Float
-    , zoom : Int
+    , zoom : Float
     }
 
 
@@ -12,14 +12,14 @@ init : Model
 init =
     { latitude = 47.227099
     , longitude = 8.822077
-    , zoom = 12
+    , zoom = 12.0
     }
 
 
 type alias JsObject =
     { lat : Float
     , lng : Float
-    , zoom : Int
+    , zoom : Float
     }
 
 
