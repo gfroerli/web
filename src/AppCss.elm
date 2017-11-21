@@ -11,6 +11,12 @@ css =
     (stylesheet << namespace "gfr") <|
         List.concat
             [ [ h1 [ color Colors.blue ]
+              , id "wrapper" [ displayFlex ]
               , id "map" [ width (pct 100), height (px 500) ]
+              , id "sidebar"
+                    [ minWidth (px 300)
+                    , width (pct 30)
+                    , padding (px 16)
+                    ]
               ]
             ]

@@ -84,5 +84,11 @@ view model =
                     ++ " | Zoom: "
                     ++ toString model.map.zoom
             ]
-        , div [ id "map" ] []
+        , div [ id "wrapper" ]
+            [ div [ id "map" ] []
+            , div [ id "sidebar" ]
+                [ h2 [] [ text "Details" ]
+                , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
+                ]
+            ]
         ]
