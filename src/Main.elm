@@ -54,8 +54,8 @@ update msg model =
 
                 newMap =
                     { oldMap
-                        | latitude = pos.latitude
-                        , longitude = pos.longitude
+                        | lat = pos.lat
+                        , lng = pos.lng
                         , zoom = pos.zoom
                     }
             in
@@ -78,9 +78,9 @@ view model =
         , p []
             [ text <|
                 "Lat: "
-                    ++ toString model.map.latitude
+                    ++ toString model.map.lat
                     ++ " | Lng: "
-                    ++ toString model.map.longitude
+                    ++ toString model.map.lng
                     ++ " | Zoom: "
                     ++ toString model.map.zoom
             ]

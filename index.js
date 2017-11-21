@@ -19,7 +19,7 @@ app.ports.initializeMap.subscribe((pos) => {
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/outdoors-v10?optimize=true',
-        center: [pos.longitude, pos.latitude],
+        center: [pos.lng, pos.lat],
         zoom: pos.zoom,
         pitchWithRotate: false,
     });
@@ -40,22 +40,22 @@ app.ports.initializeMap.subscribe((pos) => {
     // Listen for map move events from Elm
     app.ports.moveMap.subscribe((newPos) => {
         console.debug('Map: New coordinates received:', newPos);
-        map.setCenter([newPos.longitude, newPos.latitude]);
+        map.setCenter([newPos.lng, newPos.lat]);
         map.setZoom(newPos.zoom)
     });
 
     // Subscribe to JS events
     map.on('moveend', (ev) => {
         app.ports.mapMoved.send({
-            latitude: map.getCenter().lat,
-            longitude: map.getCenter().lng,
+            lat: map.getCenter().lat,
+            lng: map.getCenter().lng,
             zoom: map.getZoom(),
         });
     });
     map.on('zoom', (ev) => {
         app.ports.mapMoved.send({
-            latitude: map.getCenter().lat,
-            longitude: map.getCenter().lng,
+            lat: map.getCenter().lat,
+            lng: map.getCenter().lng,
             zoom: map.getZoom(),
         });
     });

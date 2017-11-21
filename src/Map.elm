@@ -2,15 +2,21 @@ module Map exposing (Model, init)
 
 
 type alias Model =
-    { latitude : Float
-    , longitude : Float
+    { lat : Float
+    , lng : Float
     , zoom : Float
     }
 
 
 init : Model
 init =
-    { latitude = 47.227099
-    , longitude = 8.822077
+    { lat = 47.227099
+    , lng = 8.822077
     , zoom = 12.0
+    }
+
+
+type alias Pos =
+    { lat : Float
+    , lng : Float
     }
