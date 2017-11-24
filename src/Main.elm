@@ -1,7 +1,9 @@
 module Main exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Css exposing (..)
+import Html
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (..)
 import Map
 import MapPort
 
@@ -9,7 +11,7 @@ import MapPort
 main =
     Html.program
         { init = init
-        , view = view
+        , view = view >> toUnstyled
         , update = update
         , subscriptions = subscriptions
         }
@@ -85,7 +87,14 @@ view model =
                     ++ toString model.map.zoom
             ]
         , div [ id "wrapper" ]
-            [ div [ id "map" ] []
+            [ div
+                [ id "map"
+                , css
+                    [ Css.width (pct 100)
+                    , Css.height (px 400)
+                    ]
+                ]
+                []
             , div [ id "sidebar" ]
                 [ h2 [] [ text "Details" ]
                 , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
