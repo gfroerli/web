@@ -1,6 +1,8 @@
 module Main exposing (..)
 
 import Css exposing (..)
+import Css.Foreign as Foreign
+import Css.Reset
 import Html
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
@@ -76,7 +78,10 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text "Gfrör.li – Wassertemperaturen Schweiz" ]
+        [ Css.Reset.css
+        , Foreign.global
+            [ Foreign.body [] ]
+        , h1 [] [ text "Gfrör.li – Wassertemperaturen Schweiz" ]
         , p []
             [ text <|
                 "Lat: "
