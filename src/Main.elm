@@ -4,8 +4,9 @@ import Css exposing (..)
 import Css.Foreign as Foreign
 import Css.Reset
 import Html
-import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (..)
+import Html.Styled exposing (Html, toUnstyled)
+import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text)
+import Html.Styled.Attributes as Attr exposing (id, class, css)
 import Map
 import MapPort
 
@@ -80,9 +81,18 @@ view model =
     div []
         [ Css.Reset.css
         , Foreign.global
-            [ Foreign.body [] ]
-        , h1 [] [ text "Gfrör.li – Wassertemperaturen Schweiz" ]
-        , p []
+            [ Foreign.body <| fontBody ++ [ paddingTop (px 16), fontSize (px 16) ]
+            , Foreign.h1 <| fontHeading ++ [ fontSize (em 3.4) ]
+            , Foreign.h2 <| fontHeading ++ [ fontSize (em 2.2) ]
+            , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6) ]
+            , Foreign.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
+            , Foreign.p [ lineHeight (em 1.5) ]
+            ]
+        , div [ css [ width (pct 100) ] ]
+            [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
+            , h2 [ css [ textAlign center ] ] [ text "Wassertemperaturen Schweiz" ]
+            ]
+        , p [ css [ textAlign center, margin2 (px 16) zero ] ]
             [ text <|
                 "Lat: "
                     ++ toString model.map.lat
@@ -94,10 +104,7 @@ view model =
         , div [ id "wrapper" ]
             [ div
                 [ id "map"
-                , css
-                    [ Css.width (pct 100)
-                    , Css.height (px 400)
-                    ]
+                , css [ width (pct 100), height (px 600) ]
                 ]
                 []
             , div [ id "sidebar" ]
@@ -106,3 +113,17 @@ view model =
                 ]
             ]
         ]
+
+
+fontBody : List Style
+fontBody =
+    [ fontFamilies [ "Montserrat", .value sansSerif ]
+    , color (rgb 50 50 50)
+    ]
+
+
+fontHeading : List Style
+fontHeading =
+    [ fontFamilies [ "Barlow Semi Condensed", .value sansSerif ]
+    , color (rgb 50 50 50)
+    ]
