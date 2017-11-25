@@ -5,8 +5,12 @@ import Css.Foreign as Foreign
 import Css.Reset
 import Html
 import Html.Styled exposing (Html, toUnstyled)
-import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text)
+import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, button)
 import Html.Styled.Attributes as Attr exposing (id, class, css)
+import Html.Styled.Events as Events
+import Http
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline as Pipeline
 import Map
 import MapPort
 
@@ -29,6 +33,13 @@ type alias Model =
     }
 
 
+type alias Sensor =
+    { id : Int
+    , deviceName : String
+    , caption : Maybe String
+    }
+
+
 init : ( Model, Cmd Msg )
 init =
     let
@@ -46,12 +57,20 @@ init =
 
 
 type Msg
-    = MapDragged Map.Model
+    = LoadData
+    | DataLoaded (Result Http.Error (List Sensor))
+    | MapDragged Map.Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        LoadData ->
+            ( model, loadData )
+
+        DataLoaded result ->
+            ( model, Cmd.none )
+
         MapDragged pos ->
             let
                 oldMap =
@@ -67,9 +86,38 @@ update msg model =
                 ( Model newMap, Cmd.none )
 
 
+loadData : Cmd Msg
+loadData =
+    let
+        url =
+            "https://watertemp-api.coredump.ch/api/sensors"
+
+        request =
+            Http.get url decodeApiResponse
+    in
+        Http.send DataLoaded request
+
+
+decodeApiResponse : Decoder (List Sensor)
+decodeApiResponse =
+    Decode.list sensorDecoder
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     MapPort.mapMoved MapDragged
+
+
+
+-- DECODERS
+
+
+sensorDecoder : Decoder Sensor
+sensorDecoder =
+    Pipeline.decode Sensor
+        |> Pipeline.required "id" Decode.int
+        |> Pipeline.required "device_name" Decode.string
+        |> Pipeline.required "caption" (Decode.nullable Decode.string)
 
 
 
@@ -101,6 +149,7 @@ view model =
                     ++ " | Zoom: "
                     ++ toString model.map.zoom
             ]
+        , button [ Events.onClick LoadData ] [ text "Load data" ]
         , div [ id "wrapper" ]
             [ div
                 [ id "map"
@@ -115,6 +164,8 @@ view model =
         ]
 
 
+{-| Font related styling rules for the entire body
+-}
 fontBody : List Style
 fontBody =
     [ fontFamilies [ "Montserrat", .value sansSerif ]
@@ -122,6 +173,8 @@ fontBody =
     ]
 
 
+{-| Font related styling rules for all headings
+-}
 fontHeading : List Style
 fontHeading =
     [ fontFamilies [ "Barlow Semi Condensed", .value sansSerif ]
