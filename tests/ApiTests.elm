@@ -1,9 +1,9 @@
-module Example exposing (..)
+module ApiTests exposing (..)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Http
-import Main exposing (..)
+import Api exposing (..)
 import Test exposing (..)
 
 

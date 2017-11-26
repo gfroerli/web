@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Api
 import Css exposing (..)
 import Css.Foreign as Foreign
 import Css.Reset
@@ -9,8 +10,7 @@ import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, button)
 import Html.Styled.Attributes as Attr exposing (id, class, css)
 import Html.Styled.Events as Events
 import Http
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline as Pipeline
+import Json.Decode as Decode
 import Map
 import MapPort
 import Time
@@ -41,13 +41,6 @@ type alias Model =
     }
 
 
-type alias Sensor =
-    { id : Int
-    , deviceName : String
-    , caption : Maybe String
-    }
-
-
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
@@ -66,7 +59,7 @@ init flags =
 
 type Msg
     = LoadData String
-    | DataLoaded (Result Http.Error (List Sensor))
+    | DataLoaded (Result Http.Error (List Api.Sensor))
     | MapDragged Map.Model
 
 
@@ -107,10 +100,10 @@ loadData apiToken =
         request =
             Http.request
                 { method = "GET"
-                , headers = getHeaders apiToken
+                , headers = Api.getHeaders apiToken
                 , url = url
                 , body = Http.emptyBody
-                , expect = Http.expectJson decodeApiResponse
+                , expect = Http.expectJson (Decode.list Api.sensorDecoder)
                 , timeout = Just (30 * Time.second)
                 , withCredentials = False
                 }
@@ -118,31 +111,9 @@ loadData apiToken =
         Http.send DataLoaded request
 
 
-getHeaders : String -> List Http.Header
-getHeaders apiToken =
-    [ Http.header "Authorization" ("Bearer " ++ apiToken) ]
-
-
-decodeApiResponse : Decoder (List Sensor)
-decodeApiResponse =
-    Decode.list sensorDecoder
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
     MapPort.mapMoved MapDragged
-
-
-
--- DECODERS
-
-
-sensorDecoder : Decoder Sensor
-sensorDecoder =
-    Pipeline.decode Sensor
-        |> Pipeline.required "id" Decode.int
-        |> Pipeline.required "device_name" Decode.string
-        |> Pipeline.required "caption" (Decode.nullable Decode.string)
 
 
 
