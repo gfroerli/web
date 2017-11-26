@@ -1,35 +1,39 @@
-module.exports = {
-    entry: './index.js',
+const path = require("path");
 
-    output: {
-        path: './dist',
-        filename: 'index.js'
+module.exports = {
+    entry: {
+        app: [
+            './src/index.js',
+        ]
     },
 
-    resolve: {
-        modulesDirectories: ['node_modules'],
-        extensions: ['', '.js', '.elm']
+    output: {
+        path: path.resolve(__dirname + '/dist'),
+        filename: '[name].js'
     },
 
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.html$/,
                 exclude: /node_modules/,
-                loader: 'file?name=[name].[ext]'
+                loader: 'file-loader?name=[name].[ext]'
             },
             {
                 test: /\.elm$/,
                 exclude: [/elm-stuff/, /node_modules/],
-                loader: 'elm-webpack'
+                loader: 'elm-webpack-loader?verbose=true&warn=true'
             }
-        ]
+        ],
+
+        noParse: /\.elm$/,
     },
 
     target: 'web',
 
     devServer: {
         inline: true,
-        stats: 'errors-only'
-    }
+        stats: { colors: true },
+    },
+
 };

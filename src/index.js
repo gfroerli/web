@@ -2,7 +2,7 @@
 
 require('./index.html');
 
-const Elm = require('./src/Main');
+const Elm = require('./Main.elm');
 const app = Elm.Main.embed(document.getElementById('main'));
 
 app.ports.initializeMap.subscribe((pos) => {
