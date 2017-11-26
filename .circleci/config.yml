@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: codesimple/elm:0.18
+    steps:
+      - checkout
+      - run:
+          name: Install npm dependencies
+          command: npm install
+      - run:
+          name: Install elm dependencies
+          command: elm-make --yes
+      - run:
+          name: Build project
+          command: npm run build
+      - run:
+          name: Test project
+          command: npm test

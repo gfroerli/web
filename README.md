@@ -1,5 +1,7 @@
 # Water Sensor Web
 
+[![CircleCI][circle-ci-badge]][circle-ci]
+
 Web application for the water sensor API, written in
 [Elm](http://elm-lang.org/).
 
@@ -36,3 +38,8 @@ To start the dev server:
 
 Now visit [localhost:8000](http://localhost:8000/) in your browser
 to see the application.
+
+
+<!-- Badges -->
+[circle-ci]: https://circleci.com/gh/coredump-ch/water-sensor-web/tree/master
+[circle-ci-badge]: https://circleci.com/gh/coredump-ch/water-sensor-web/tree/master.svg?style=shield
