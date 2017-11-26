@@ -13,16 +13,22 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline
 import Map
 import MapPort
+import Time
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view >> toUnstyled
         , update = update
         , subscriptions = subscriptions
         }
+
+
+type alias Flags =
+    { apiToken : String
+    }
 
 
 
@@ -31,6 +37,7 @@ main =
 
 type alias Model =
     { map : Map.Model
+    , apiToken : String
     }
 
 
@@ -41,13 +48,13 @@ type alias Sensor =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     let
         map =
             Map.init
     in
-        ( { map = map }
+        ( Model map flags.apiToken
         , map
             |> MapPort.initializeMap
         )
@@ -58,7 +65,7 @@ init =
 
 
 type Msg
-    = LoadData
+    = LoadData String
     | DataLoaded (Result Http.Error (List Sensor))
     | MapDragged Map.Model
 
@@ -66,11 +73,15 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadData ->
-            ( model, loadData )
+        LoadData apiToken ->
+            ( model, loadData apiToken )
 
         DataLoaded result ->
-            ( model, Cmd.none )
+            let
+                _ =
+                    Debug.log "Loaded data:" result
+            in
+                ( model, Cmd.none )
 
         MapDragged pos ->
             let
@@ -84,19 +95,32 @@ update msg model =
                         , zoom = pos.zoom
                     }
             in
-                ( Model newMap, Cmd.none )
+                ( { model | map = newMap }, Cmd.none )
 
 
-loadData : Cmd Msg
-loadData =
+loadData : String -> Cmd Msg
+loadData apiToken =
     let
         url =
             "https://watertemp-api.coredump.ch/api/sensors"
 
         request =
-            Http.get url decodeApiResponse
+            Http.request
+                { method = "GET"
+                , headers = getHeaders apiToken
+                , url = url
+                , body = Http.emptyBody
+                , expect = Http.expectJson decodeApiResponse
+                , timeout = Just (30 * Time.second)
+                , withCredentials = False
+                }
     in
         Http.send DataLoaded request
+
+
+getHeaders : String -> List Http.Header
+getHeaders apiToken =
+    [ Http.header "Authorization" ("Bearer " ++ apiToken) ]
 
 
 decodeApiResponse : Decoder (List Sensor)
@@ -150,7 +174,7 @@ view model =
                     ++ " | Zoom: "
                     ++ toString model.map.zoom
             ]
-        , button [ Events.onClick LoadData ] [ text "Load data" ]
+        , button [ Events.onClick (LoadData model.apiToken) ] [ text "Load data" ]
         , div [ id "wrapper" ]
             [ div
                 [ id "map"

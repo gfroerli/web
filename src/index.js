@@ -3,9 +3,13 @@
 require('./index.html');
 
 const Elm = require('./Main.elm');
-const app = Elm.Main.embed(document.getElementById('main'));
+const elmDiv = document.getElementById('main');
+const elmFlags = {
+    apiToken: process.env.API_TOKEN,
+};
+const elmApp = Elm.Main.embed(elmDiv, elmFlags);
 
-app.ports.initializeMap.subscribe((pos) => {
+elmApp.ports.initializeMap.subscribe((pos) => {
     console.info('Map: Initialize');
 
     // TODO:
@@ -37,7 +41,7 @@ app.ports.initializeMap.subscribe((pos) => {
     map.addControl(geo, 'top-right');
 
     // Listen for map move events from Elm
-    app.ports.moveMap.subscribe((newPos) => {
+    elmApp.ports.moveMap.subscribe((newPos) => {
         console.debug('Map: New coordinates received:', newPos);
         map.setCenter([newPos.lng, newPos.lat]);
         map.setZoom(newPos.zoom)
@@ -45,14 +49,14 @@ app.ports.initializeMap.subscribe((pos) => {
 
     // Subscribe to JS events
     map.on('moveend', (ev) => {
-        app.ports.mapMoved.send({
+        elmApp.ports.mapMoved.send({
             lat: map.getCenter().lat,
             lng: map.getCenter().lng,
             zoom: map.getZoom(),
         });
     });
     map.on('zoom', (ev) => {
-        app.ports.mapMoved.send({
+        elmApp.ports.mapMoved.send({
             lat: map.getCenter().lat,
             lng: map.getCenter().lng,
             zoom: map.getZoom(),

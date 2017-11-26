@@ -1,5 +1,11 @@
+const dotenv = require('dotenv');
 const path = require("path");
+const webpack = require('webpack')
 
+// Load .env file
+dotenv.config();
+
+// Webpack config
 module.exports = {
     entry: {
         app: [
@@ -29,11 +35,19 @@ module.exports = {
         noParse: /\.elm$/,
     },
 
+    plugins: [
+        new webpack.EnvironmentPlugin(["API_TOKEN"]),
+    ],
+
     target: 'web',
 
     devServer: {
         inline: true,
-        stats: { colors: true },
+        stats: {
+            colors: true,
+            hash: false,
+            modules: false,
+        },
     },
 
 };

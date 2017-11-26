@@ -10,6 +10,7 @@
         "dev": "webpack-dev-server --port 8000"
     },
     "devDependencies": {
+        "dotenv": "^4.0.0",
         "elm-webpack-loader": "^4.4.0",
         "file-loader": "^1.1.5",
         "style-loader": "^0.13.1",

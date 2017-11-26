@@ -16,6 +16,10 @@ To install all dependencies:
     npm install
     elm-make
 
+Next, set up the required env vars:
+
+    echo "API_TOKEN='...'" >> .env
+
 ## Building
 
 To build the application, just type
