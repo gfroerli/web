@@ -1,0 +1,42 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: codesimple/elm:0.18
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+            - v1-cache-{{ arch }}-{{ .Branch }}
+            - v1-cache-{{ arch }}
+      - run:
+          name: Install npm dependencies
+          command: npm install
+      - run:
+          name: Install elm dependencies
+          command: elm-make --yes
+      - run:
+          name: Build project
+          command: npm run build
+      - run:
+          name: Test project
+          command: npm test
+      - save_cache:
+          key:  v1-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          paths:
+            - elm-stuff
+            - tests/elm-stuff
+            - node_modules
+      - save_cache:
+          key: v1-cache-{{ arch }}-{{ .Branch }}
+          paths:
+            - elm-stuff
+            - tests/elm-stuff
+            - node_modules
+      - save_cache:
+          key: v1-cache-{{ arch }}
+          paths:
+            - elm-stuff
+            - tests/elm-stuff
+            - node_modules
