@@ -41,10 +41,20 @@ elmApp.ports.initializeMap.subscribe((pos) => {
     map.addControl(geo, 'top-right');
 
     // Listen for map move events from Elm
-    elmApp.ports.moveMap.subscribe((newPos) => {
+    elmApp.ports.moveMap.subscribe(newPos => {
         console.debug('Map: New coordinates received:', newPos);
         map.setCenter([newPos.lng, newPos.lat]);
         map.setZoom(newPos.zoom)
+    });
+
+    // When new sensors are loaded, display them
+    elmApp.ports.sensorsLoaded.subscribe(sensors => {
+        console.debug('Map:', sensors.length, 'new sensors have been loaded:', sensors);
+        sensors.forEach(sensor => {
+            new mapboxgl.Marker()
+                .setLngLat([sensor.pos.lng, sensor.pos.lat])
+                .addTo(map);
+        });
     });
 
     // Subscribe to JS events

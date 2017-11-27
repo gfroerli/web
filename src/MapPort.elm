@@ -1,5 +1,6 @@
 port module MapPort exposing (..)
 
+import Api
 import Map
 
 
@@ -10,6 +11,9 @@ port initializeMap : Map.Model -> Cmd msg
 
 
 port moveMap : Map.Model -> Cmd msg
+
+
+port sensorsLoaded : List Api.JsSensor -> Cmd msg
 
 
 

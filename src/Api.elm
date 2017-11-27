@@ -1,10 +1,11 @@
-module Api exposing (getHeaders, Sensor, sensorDecoder)
+module Api exposing (getHeaders, Sensor, JsSensor, sensorDecoder, toJsSensor)
 
+import Date exposing (Date)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
-import Date exposing (Date)
+import Map
 
 
 -- AUTHENTICATION
@@ -16,7 +17,7 @@ getHeaders apiToken =
 
 
 
--- DECODERS
+-- MODELS
 
 
 type alias Sensor =
@@ -31,6 +32,18 @@ type alias Sensor =
     }
 
 
+type alias JsSensor =
+    { id : Int
+    , deviceName : String
+    , caption : Maybe String
+    , pos : Map.Pos
+    }
+
+
+
+-- DECODERS
+
+
 sensorDecoder : Decode.Decoder Sensor
 sensorDecoder =
     Pipeline.decode Sensor
@@ -42,3 +55,19 @@ sensorDecoder =
         |> Pipeline.required "sponsor_id" (Decode.nullable Decode.int)
         |> Pipeline.required "created_at" DecodeExtra.date
         |> Pipeline.required "updated_at" DecodeExtra.date
+
+
+
+-- HELPERS
+
+
+toJsSensor : Sensor -> JsSensor
+toJsSensor sensor =
+    JsSensor
+        sensor.id
+        sensor.deviceName
+        sensor.caption
+        (Map.Pos
+            sensor.latitude
+            sensor.longitude
+        )

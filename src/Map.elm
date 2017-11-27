@@ -1,4 +1,4 @@
-module Map exposing (Model, init)
+module Map exposing (Model, Pos, init)
 
 
 type alias Model =

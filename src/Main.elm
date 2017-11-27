@@ -73,11 +73,14 @@ update msg model =
         DataLoaded result ->
             let
                 _ =
-                    Debug.log "Loaded data:" result
+                    Debug.log "Loaded data" result
             in
                 case result of
                     Ok sensors ->
-                        ( { model | sensors = sensors }, Cmd.none )
+                        ( { model | sensors = sensors }
+                        , List.map Api.toJsSensor sensors
+                            |> MapPort.sensorsLoaded
+                        )
 
                     Err error ->
                         let
