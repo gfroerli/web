@@ -49,8 +49,10 @@ init flags =
             Map.init
     in
         ( Model map [] flags.apiToken
-        , map
-            |> MapPort.initializeMap
+        , Cmd.batch
+            [ MapPort.initializeMap map
+            , loadData flags.apiToken
+            ]
         )
 
 
