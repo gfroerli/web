@@ -37,6 +37,7 @@ type alias Flags =
 
 type alias Model =
     { map : Map.Model
+    , sensors : List Api.Sensor
     , apiToken : String
     }
 
@@ -47,7 +48,7 @@ init flags =
         map =
             Map.init
     in
-        ( Model map flags.apiToken
+        ( Model map [] flags.apiToken
         , map
             |> MapPort.initializeMap
         )
@@ -74,7 +75,16 @@ update msg model =
                 _ =
                     Debug.log "Loaded data:" result
             in
-                ( model, Cmd.none )
+                case result of
+                    Ok sensors ->
+                        ( { model | sensors = sensors }, Cmd.none )
+
+                    Err error ->
+                        let
+                            _ =
+                                Debug.log "Error while fetching data" error
+                        in
+                            ( model, Cmd.none )
 
         MapDragged pos ->
             let
