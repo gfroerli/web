@@ -83,6 +83,7 @@ update msg model =
                     Err error ->
                         let
                             _ =
+                                -- TODO
                                 Debug.log "Error while fetching data" error
                         in
                             ( model, Cmd.none )
@@ -159,14 +160,46 @@ view model =
                     ++ " | Zoom: "
                     ++ toString model.map.zoom
             ]
-        , div [ id "wrapper" ]
-            [ div
-                [ id "map"
-                , css [ width (pct 100), height (px 600) ]
+        , div
+            [ id "wrapper"
+            , css
+                [ position relative
+                , height (pct 100)
+                , minHeight (px 500)
+                , width (pct 100)
+                , displayFlex
+                , flexDirection row
+                , alignItems stretch
                 ]
-                []
-            , div [ id "sidebar" ]
-                [ h2 [] [ text "Details" ]
+            ]
+            [ div
+                [ id "mapContainer"
+                , css
+                    [ position relative
+                    , flexGrow (num 1)
+                    ]
+                ]
+                [ div
+                    [ id "map"
+                    , css
+                        [ position absolute
+                        , top zero
+                        , bottom zero
+                        , left zero
+                        , right zero
+                        ]
+                    ]
+                    []
+                ]
+            , div
+                [ id "sidebar"
+                , css
+                    [ flexBasis (pct 20)
+                    , padding (px 16)
+                    , backgroundColor (hex "#F7F7F7")
+                    ]
+                ]
+                [ h2 [ css [ marginBottom (em 0.5) ] ] [ text "Details" ]
                 , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
                 ]
             ]
