@@ -49,11 +49,18 @@ elmApp.ports.initializeMap.subscribe((pos) => {
 
     // When new sensors are loaded, display them
     elmApp.ports.sensorsLoaded.subscribe(sensors => {
-        console.debug('Map:', sensors.length, 'new sensors have been loaded:', sensors);
+        console.debug('Map:', sensors.length, 'new sensors have been loaded.');
         sensors.forEach(sensor => {
-            new mapboxgl.Marker()
+            // Add marker to map
+            const marker = new mapboxgl.Marker()
                 .setLngLat([sensor.pos.lng, sensor.pos.lat])
                 .addTo(map);
+
+            // Add event listener
+            marker.getElement()
+                .addEventListener('click', (ev) => {
+                    elmApp.ports.sensorClicked.send(sensor);
+                });
         });
     });
 

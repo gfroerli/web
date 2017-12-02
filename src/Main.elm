@@ -6,10 +6,11 @@ import Css.Foreign as Foreign
 import Css.Reset
 import Html
 import Html.Styled exposing (Html, toUnstyled)
-import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, button)
+import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, strong)
 import Html.Styled.Attributes as Attr exposing (id, class, css)
 import Http
 import Json.Decode as Decode
+import List.Extra exposing (find)
 import Map
 import MapPort
 import Time
@@ -36,8 +37,8 @@ type alias Flags =
 
 type alias Model =
     { map : Map.Model
+    , sensors : List Api.Sensor
     , selectedSensor : Maybe Api.Sensor
-    , otherSensors : List Api.Sensor
     , apiToken : String
     }
 
@@ -48,7 +49,7 @@ init flags =
         map =
             Map.init
     in
-        ( Model map Nothing [] flags.apiToken
+        ( Model map [] Nothing flags.apiToken
         , MapPort.initializeMap map
         )
 
@@ -61,6 +62,7 @@ type Msg
     = MapInitialized ()
     | MapDragged Map.Model
     | DataLoaded (Result Http.Error (List Api.Sensor))
+    | SensorClicked (Maybe Api.JsSensor)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -72,7 +74,7 @@ update msg model =
         DataLoaded result ->
             case result of
                 Ok sensors ->
-                    ( { model | selectedSensor = Nothing, otherSensors = sensors }
+                    ( { model | selectedSensor = Nothing, sensors = sensors }
                     , List.map Api.toJsSensor sensors
                         |> MapPort.sensorsLoaded
                     )
@@ -98,6 +100,17 @@ update msg model =
                     }
             in
                 ( { model | map = newMap }, Cmd.none )
+
+        SensorClicked (Just jsSensor) ->
+            let
+                selectedSensor =
+                    find (\sensor -> sensor.id == jsSensor.id)
+                        model.sensors
+            in
+                ( { model | selectedSensor = selectedSensor }, Cmd.none )
+
+        SensorClicked Nothing ->
+            ( { model | selectedSensor = Nothing }, Cmd.none )
 
 
 loadData : String -> Cmd Msg
@@ -125,6 +138,7 @@ subscriptions model =
     Sub.batch
         [ MapPort.mapInitialized MapInitialized
         , MapPort.mapMoved MapDragged
+        , MapPort.sensorClicked SensorClicked
         ]
 
 
@@ -143,6 +157,8 @@ view model =
             , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6) ]
             , Foreign.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
             , Foreign.p [ lineHeight (em 1.5) ]
+            , Foreign.strong [ fontWeight bold ]
+            , Foreign.class "mapboxgl-marker" [ cursor pointer ]
             ]
         , div [ css [ width (pct 100) ] ]
             [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
@@ -156,6 +172,13 @@ view model =
                     ++ toString model.map.lng
                     ++ " | Zoom: "
                     ++ toString model.map.zoom
+                    ++ " | Selected sensor: "
+                    ++ case model.selectedSensor of
+                        Just x ->
+                            toString x.id
+
+                        Nothing ->
+                            "None"
             ]
         , div
             [ id "wrapper"
@@ -196,10 +219,28 @@ view model =
                     , backgroundColor (hex "#F7F7F7")
                     ]
                 ]
-                [ h2 [ css [ marginBottom (em 0.5) ] ] [ text "Details" ]
-                , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
-                ]
+                (sidebarContents model)
             ]
+        ]
+
+
+sidebarContents : Model -> List (Html Msg)
+sidebarContents model =
+    [ h2
+        [ css [ marginBottom (em 0.5) ] ]
+        [ text <| Maybe.withDefault "Details" (Maybe.map .deviceName model.selectedSensor) ]
+    , Maybe.withDefault
+        (p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ])
+        (Maybe.map sensorDescription model.selectedSensor)
+    ]
+
+
+sensorDescription : Api.Sensor -> Html Msg
+sensorDescription sensor =
+    div []
+        [ Maybe.withDefault
+            (p [] [ text "Keine Beschreibung" ])
+            (Maybe.map (\s -> (p [] [ text s ])) sensor.caption)
         ]
 
 

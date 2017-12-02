@@ -24,3 +24,6 @@ port mapInitialized : (() -> msg) -> Sub msg
 
 
 port mapMoved : (Map.Model -> msg) -> Sub msg
+
+
+port sensorClicked : (Maybe Api.JsSensor -> msg) -> Sub msg
