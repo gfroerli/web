@@ -39,6 +39,12 @@ To start the dev server:
 Now visit [localhost:8000](http://localhost:8000/) in your browser
 to see the application.
 
+## Tests
+
+To run the tests:
+
+    npm test
+
 
 <!-- Badges -->
 [circle-ci]: https://circleci.com/gh/coredump-ch/water-sensor-web/tree/master
