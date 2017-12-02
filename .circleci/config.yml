@@ -7,9 +7,9 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
-            - v1-cache-{{ arch }}-{{ .Branch }}
-            - v1-cache-{{ arch }}
+            - v2-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+            - v2-cache-{{ arch }}-{{ .Branch }}
+            - v2-cache-{{ arch }}
       - run:
           name: Install npm dependencies
           command: npm install
@@ -23,20 +23,16 @@ jobs:
           name: Test project
           command: npm test
       - save_cache:
-          key:  v1-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          key:  v2-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
           paths:
             - elm-stuff
             - tests/elm-stuff
             - node_modules
       - save_cache:
-          key: v1-cache-{{ arch }}-{{ .Branch }}
+          key: v2-cache-{{ arch }}-{{ .Branch }}
           paths:
-            - elm-stuff
-            - tests/elm-stuff
             - node_modules
       - save_cache:
-          key: v1-cache-{{ arch }}
+          key: v2-cache-{{ arch }}
           paths:
-            - elm-stuff
-            - tests/elm-stuff
             - node_modules
