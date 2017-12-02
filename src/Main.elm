@@ -8,7 +8,6 @@ import Html
 import Html.Styled exposing (Html, toUnstyled)
 import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, button)
 import Html.Styled.Attributes as Attr exposing (id, class, css)
-import Html.Styled.Events as Events
 import Http
 import Json.Decode as Decode
 import Map
@@ -49,10 +48,7 @@ init flags =
             Map.init
     in
         ( Model map [] flags.apiToken
-        , Cmd.batch
-            [ MapPort.initializeMap map
-            , loadData flags.apiToken
-            ]
+        , MapPort.initializeMap map
         )
 
 
@@ -61,16 +57,16 @@ init flags =
 
 
 type Msg
-    = LoadData String
-    | DataLoaded (Result Http.Error (List Api.Sensor))
+    = MapInitialized ()
     | MapDragged Map.Model
+    | DataLoaded (Result Http.Error (List Api.Sensor))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadData apiToken ->
-            ( model, loadData apiToken )
+        MapInitialized _ ->
+            ( model, loadData model.apiToken )
 
         DataLoaded result ->
             let
@@ -128,7 +124,10 @@ loadData apiToken =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    MapPort.mapMoved MapDragged
+    Sub.batch
+        [ MapPort.mapInitialized MapInitialized
+        , MapPort.mapMoved MapDragged
+        ]
 
 
 
@@ -160,7 +159,6 @@ view model =
                     ++ " | Zoom: "
                     ++ toString model.map.zoom
             ]
-        , button [ Events.onClick (LoadData model.apiToken) ] [ text "Load data" ]
         , div [ id "wrapper" ]
             [ div
                 [ id "map"

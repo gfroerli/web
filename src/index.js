@@ -72,4 +72,9 @@ elmApp.ports.initializeMap.subscribe((pos) => {
             zoom: map.getZoom(),
         });
     });
+
+    // Notify Elm that the map has been initialized
+    elmApp.ports.mapInitialized.send(null);
 });
+
+window.foo = elmApp;

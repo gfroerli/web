@@ -20,4 +20,7 @@ port sensorsLoaded : List Api.JsSensor -> Cmd msg
 -- Incoming Port
 
 
+port mapInitialized : (() -> msg) -> Sub msg
+
+
 port mapMoved : (Map.Model -> msg) -> Sub msg
