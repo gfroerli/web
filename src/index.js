@@ -50,17 +50,23 @@ elmApp.ports.initializeMap.subscribe((pos) => {
     // When new sensors are loaded, display them
     elmApp.ports.sensorsLoaded.subscribe(sensors => {
         console.debug('Map:', sensors.length, 'new sensors have been loaded.');
+
         sensors.forEach(sensor => {
+            // Create marker element
+            const el = document.createElement('div');
+            el.className = 'marker';
+            const text = document.createTextNode('?');
+            el.appendChild(text)
+
             // Add marker to map
-            const marker = new mapboxgl.Marker()
+            const marker = new mapboxgl.Marker(el)
                 .setLngLat([sensor.pos.lng, sensor.pos.lat])
                 .addTo(map);
 
             // Add event listener
-            marker.getElement()
-                .addEventListener('click', (ev) => {
-                    elmApp.ports.sensorClicked.send(sensor);
-                });
+            el.addEventListener('click', (ev) => {
+                elmApp.ports.sensorClicked.send(sensor);
+            });
         });
     });
 

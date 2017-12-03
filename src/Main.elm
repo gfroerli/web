@@ -158,7 +158,18 @@ view model =
             , Foreign.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
             , Foreign.p [ lineHeight (em 1.5) ]
             , Foreign.strong [ fontWeight bold ]
-            , Foreign.class "mapboxgl-marker" [ cursor pointer ]
+            , Foreign.class "marker"
+                [ backgroundImage (url "/static/marker.svg")
+                , backgroundSize cover
+                , width (px 32)
+                , height (px 32)
+                , lineHeight (px 32)
+                , cursor pointer
+                , textAlign center
+                , verticalAlign middle
+                , fontWeight bold
+                , fontSize (px 16)
+                ]
             ]
         , div [ css [ width (pct 100) ] ]
             [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
