@@ -13,6 +13,8 @@ import Json.Decode as Decode
 import List.Extra exposing (find)
 import Map
 import MapPort
+import Messages exposing (..)
+import Models exposing (..)
 import Time
 
 
@@ -35,14 +37,6 @@ type alias Flags =
 -- MODEL
 
 
-type alias Model =
-    { map : Map.Model
-    , sensors : List Api.Sensor
-    , selectedSensor : Maybe Api.Sensor
-    , apiToken : String
-    }
-
-
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
@@ -56,13 +50,6 @@ init flags =
 
 
 -- UPDATE
-
-
-type Msg
-    = MapInitialized ()
-    | MapDragged Map.Model
-    | DataLoaded (Result Http.Error (List Api.Sensor))
-    | SensorClicked (Maybe Api.JsSensor)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
