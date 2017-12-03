@@ -1,12 +1,12 @@
 module Messages exposing (..)
 
-import Api
 import Http
 import Map
+import Models
 
 
 type Msg
     = MapInitialized ()
     | MapDragged Map.Model
-    | DataLoaded (Result Http.Error (List Api.Sensor))
-    | SensorClicked (Maybe Api.JsSensor)
+    | DataLoaded (Result Http.Error (List Models.Sensor))
+    | SensorClicked (Maybe Models.JsSensor)

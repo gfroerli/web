@@ -1,11 +1,13 @@
-module Api exposing (getHeaders, Sensor, JsSensor, sensorDecoder, toJsSensor)
+module Api exposing (getHeaders, sensorDecoder, toJsSensor, loadSensors)
 
-import Date exposing (Date)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
 import Map
+import Messages exposing (..)
+import Models exposing (Sensor, JsSensor)
+import Time
 
 
 -- AUTHENTICATION
@@ -14,30 +16,6 @@ import Map
 getHeaders : String -> List Http.Header
 getHeaders apiToken =
     [ Http.header "Authorization" ("Bearer " ++ apiToken) ]
-
-
-
--- MODELS
-
-
-type alias Sensor =
-    { id : Int
-    , deviceName : String
-    , caption : Maybe String
-    , latitude : Float
-    , longitude : Float
-    , sponsorId : Maybe Int
-    , createdAt : Date
-    , updatedAt : Date
-    }
-
-
-type alias JsSensor =
-    { id : Int
-    , deviceName : String
-    , caption : Maybe String
-    , pos : Map.Pos
-    }
 
 
 
@@ -71,3 +49,27 @@ toJsSensor sensor =
             sensor.latitude
             sensor.longitude
         )
+
+
+
+-- API REQUESTS
+
+
+loadSensors : String -> Cmd Msg
+loadSensors apiToken =
+    let
+        url =
+            "https://watertemp-api.coredump.ch/api/sensors"
+
+        request =
+            Http.request
+                { method = "GET"
+                , headers = getHeaders apiToken
+                , url = url
+                , body = Http.emptyBody
+                , expect = Http.expectJson (Decode.list sensorDecoder)
+                , timeout = Just (30 * Time.second)
+                , withCredentials = False
+                }
+    in
+        Http.send DataLoaded request

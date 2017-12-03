@@ -8,14 +8,11 @@ import Html
 import Html.Styled exposing (Html, toUnstyled)
 import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong)
 import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
-import Http
-import Json.Decode as Decode
 import List.Extra exposing (find)
 import Map
 import MapPort
 import Messages exposing (..)
 import Models exposing (..)
-import Time
 
 
 main : Program Flags Model Msg
@@ -56,7 +53,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         MapInitialized _ ->
-            ( model, loadData model.apiToken )
+            ( model, Api.loadSensors model.apiToken )
 
         DataLoaded result ->
             case result of
@@ -98,26 +95,6 @@ update msg model =
 
         SensorClicked Nothing ->
             ( { model | selectedSensor = Nothing }, Cmd.none )
-
-
-loadData : String -> Cmd Msg
-loadData apiToken =
-    let
-        url =
-            "https://watertemp-api.coredump.ch/api/sensors"
-
-        request =
-            Http.request
-                { method = "GET"
-                , headers = Api.getHeaders apiToken
-                , url = url
-                , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list Api.sensorDecoder)
-                , timeout = Just (30 * Time.second)
-                , withCredentials = False
-                }
-    in
-        Http.send DataLoaded request
 
 
 subscriptions : Model -> Sub Msg
@@ -238,7 +215,7 @@ sidebarContents model =
     ]
 
 
-sensorDescription : Api.Sensor -> Html Msg
+sensorDescription : Sensor -> Html Msg
 sensorDescription sensor =
     div []
         [ Maybe.withDefault
