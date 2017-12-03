@@ -6,8 +6,8 @@ import Css.Foreign as Foreign
 import Css.Reset
 import Html
 import Html.Styled exposing (Html, toUnstyled)
-import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, strong)
-import Html.Styled.Attributes as Attr exposing (id, class, css)
+import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong)
+import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
 import Http
 import Json.Decode as Decode
 import List.Extra exposing (find)
@@ -179,6 +179,11 @@ view model =
 
                         Nothing ->
                             "None"
+            ]
+        , div [ css [ position absolute, top (px 8), right (px 8) ] ]
+            [ a
+                [ href "https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh" ]
+                [ img [ src "/static/google-play-badge.png" ] [] ]
             ]
         , div
             [ id "wrapper"

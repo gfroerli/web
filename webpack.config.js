@@ -1,6 +1,10 @@
+// Base
 const dotenv = require('dotenv');
 const path = require("path");
 const webpack = require('webpack')
+
+// Plugins
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 // Load .env file
 dotenv.config();
@@ -37,6 +41,7 @@ module.exports = {
 
     plugins: [
         new webpack.EnvironmentPlugin(["API_TOKEN"]),
+        new CopyWebpackPlugin([ { from: 'static', to: 'static' } ])
     ],
 
     target: 'web',
