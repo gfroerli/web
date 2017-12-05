@@ -182,7 +182,7 @@ view model =
             ]
         , div [ css [ position absolute, top (px 8), right (px 8) ] ]
             [ a
-                [ href "https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh" ]
+                [ href "https://play.google.com/apps/testing/ch.coredump.watertemp.zh" ]
                 [ img [ src "/static/google-play-badge.png" ] [] ]
             ]
         , div
