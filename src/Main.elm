@@ -133,6 +133,8 @@ view model =
                 , verticalAlign middle
                 , fontWeight bold
                 , fontSize (px 16)
+                , Foreign.withClass "selected"
+                    [ backgroundImage (url "/static/marker-selected.svg") ]
                 ]
             ]
         , div [ css [ width (pct 100) ] ]

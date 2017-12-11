@@ -27,6 +27,12 @@ elmApp.ports.initializeMap.subscribe((pos) => {
         pitchWithRotate: false,
     });
 
+    // Selected sensor element
+    const selectedSensor = {
+        el: null,
+        sensor: null,
+    };
+
     // Initialize navigation control
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
@@ -65,7 +71,16 @@ elmApp.ports.initializeMap.subscribe((pos) => {
 
             // Add event listener
             el.addEventListener('click', (ev) => {
+                console.log('selected', selectedSensor);
+                console.log('el', el);
+                const selectedClass = 'selected';
                 elmApp.ports.sensorClicked.send(sensor);
+                if (selectedSensor.el !== null) {
+                    selectedSensor.el.classList.remove(selectedClass);
+                }
+                el.classList.add(selectedClass);
+                selectedSensor.el = el;
+                selectedSensor.sensor = sensor;
             });
         });
     });
