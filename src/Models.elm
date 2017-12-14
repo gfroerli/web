@@ -21,6 +21,7 @@ type alias Sensor =
     , sponsorId : Maybe Int
     , createdAt : Date
     , updatedAt : Date
+    , lastMeasurement : Maybe Measurement
     }
 
 
@@ -29,4 +30,19 @@ type alias JsSensor =
     , deviceName : String
     , caption : Maybe String
     , pos : Map.Pos
+    , lastMeasurement : Maybe JsMeasurement
+    }
+
+
+type alias Measurement =
+    { id : Int
+    , sensorId : Maybe Int
+    , temperature : String
+    , createdAt : Date
+    , updatedAt : Date
+    }
+
+
+type alias JsMeasurement =
+    { temperature : String
     }

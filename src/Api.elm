@@ -1,4 +1,4 @@
-module Api exposing (getHeaders, sensorDecoder, toJsSensor, loadSensors)
+module Api exposing (..)
 
 import Http
 import Json.Decode as Decode
@@ -6,7 +6,7 @@ import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
 import Map
 import Messages exposing (..)
-import Models exposing (Sensor, JsSensor)
+import Models exposing (Sensor, JsSensor, Measurement, JsMeasurement)
 import Time
 
 
@@ -33,6 +33,17 @@ sensorDecoder =
         |> Pipeline.required "sponsor_id" (Decode.nullable Decode.int)
         |> Pipeline.required "created_at" DecodeExtra.date
         |> Pipeline.required "updated_at" DecodeExtra.date
+        |> Pipeline.optional "last_measurement" (Decode.nullable measurementDecoder) Nothing
+
+
+measurementDecoder : Decode.Decoder Measurement
+measurementDecoder =
+    Pipeline.decode Measurement
+        |> Pipeline.required "id" Decode.int
+        |> Pipeline.required "sensor_id" (Decode.nullable Decode.int)
+        |> Pipeline.required "temperature" Decode.string
+        |> Pipeline.required "created_at" DecodeExtra.date
+        |> Pipeline.required "updated_at" DecodeExtra.date
 
 
 
@@ -49,6 +60,13 @@ toJsSensor sensor =
             sensor.latitude
             sensor.longitude
         )
+        (Maybe.map toJsMeasurement sensor.lastMeasurement)
+
+
+toJsMeasurement : Measurement -> JsMeasurement
+toJsMeasurement measurement =
+    JsMeasurement
+        measurement.temperature
 
 
 

@@ -137,5 +137,30 @@ suite =
                                 (\_ -> Expect.fail "No parse error error for missing caption")
                                 result
                 ]
+            , describe "measurementDecoder"
+                [ test "Valid" <|
+                    \() ->
+                        let
+                            result =
+                                Decode.decodeString measurementDecoder
+                                    """
+                                    { "id": 1
+                                    , "sensor_id": 3
+                                    , "temperature": "27.3"
+                                    , "created_at": "2016-11-29T20:35:21.813Z"
+                                    , "updated_at": "2016-11-29T20:36:48.016Z"
+                                    }
+                                    """
+                        in
+                            unpack
+                                Expect.fail
+                                (Expect.all
+                                    [ \measurement -> Expect.equal measurement.id 1
+                                    , \measurement -> Expect.equal measurement.sensorId (Just 3)
+                                    , \measurement -> Expect.equal measurement.temperature "27.3"
+                                    ]
+                                )
+                                result
+                ]
             ]
         ]
