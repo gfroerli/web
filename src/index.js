@@ -61,8 +61,19 @@ elmApp.ports.initializeMap.subscribe((pos) => {
             // Create marker element
             const el = document.createElement('div');
             el.className = 'marker';
-            const text = document.createTextNode('?');
-            el.appendChild(text)
+            let text;
+            if (sensor.lastMeasurement) {
+                const tempString = sensor.lastMeasurement.temperature;
+                const tempFloat = parseFloat(tempString);
+                if (!!tempFloat) {
+                    text = document.createTextNode(Math.round(tempFloat));
+                } else {
+                    text = document.createTextNode('?');
+                }
+            } else {
+                text = document.createTextNode('?');
+            }
+            el.appendChild(text);
 
             // Add marker to map
             const marker = new mapboxgl.Marker(el)
