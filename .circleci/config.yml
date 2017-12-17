@@ -18,10 +18,10 @@ jobs:
           command: elm-make --yes
       - run:
           name: Build project
-          command: npm run build
+          command: make dist
       - run:
           name: Test project
-          command: npm test
+          command: make test
       - save_cache:
           key:  v2-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
           paths:
