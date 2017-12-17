@@ -17,7 +17,7 @@ run:
 	npm run dev
 
 clean:
-	rm -r dist/
+	rm -rf dist/
 
 dist: clean
 	npm run build
