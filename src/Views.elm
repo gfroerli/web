@@ -5,7 +5,7 @@ import Css.Foreign as Foreign
 import Css.Reset
 import Helpers exposing (formatTemperature)
 import Html.Styled exposing (Html)
-import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong)
+import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong, footer)
 import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
 import Messages exposing (..)
 import Models exposing (Model, Sensor)
@@ -13,10 +13,17 @@ import Models exposing (Model, Sensor)
 
 view : Model -> Html Msg
 view model =
-    div []
+    div
+        [ css
+            [ minHeight (vh 100)
+            , displayFlex
+            , flexDirection column
+            ]
+        ]
         [ Css.Reset.css
         , Foreign.global
-            [ Foreign.body <| fontBody ++ [ paddingTop (px 16), fontSize (px 16) ]
+            [ Foreign.body <| fontBody ++ [ fontSize (px 16) ]
+            , Foreign.id "main" [ minHeight (vh 100) ]
             , Foreign.h1 <| fontHeading ++ [ fontSize (em 3.4) ]
             , Foreign.h2 <| fontHeading ++ [ fontSize (em 2.2) ]
             , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6) ]
@@ -38,7 +45,7 @@ view model =
                     [ backgroundImage (url "/static/marker-selected.svg") ]
                 ]
             ]
-        , div [ css [ width (pct 100) ] ]
+        , div [ css [ width (pct 100), marginTop (px 16) ] ]
             [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
             , h2 [ css [ textAlign center ] ] [ text "Wassertemperaturen Schweiz" ]
             ]
@@ -57,9 +64,8 @@ view model =
             [ id "wrapper"
             , css
                 [ position relative
-                , height (pct 100)
-                , minHeight (px 500)
                 , width (pct 100)
+                , flexGrow (num 1)
                 , displayFlex
                 , flexDirection row
                 , alignItems stretch
@@ -93,6 +99,15 @@ view model =
                     ]
                 ]
                 (sidebarContents model)
+            ]
+        , footer
+            [ css
+                [ fontSize (em 0.8)
+                , textAlign center
+                , padding2 (px 8) zero
+                ]
+            ]
+            [ text "© 2017 Coredump Rapperswil-Jona"
             ]
         ]
 
