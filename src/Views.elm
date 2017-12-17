@@ -44,19 +44,9 @@ view model =
             ]
         , p [ css [ textAlign center, margin2 (px 16) zero ] ]
             [ text <|
-                "Lat: "
-                    ++ toString model.map.lat
-                    ++ " | Lng: "
-                    ++ toString model.map.lng
-                    ++ " | Zoom: "
-                    ++ toString model.map.zoom
-                    ++ " | Selected sensor: "
-                    ++ case model.selectedSensor of
-                        Just x ->
-                            toString x.id
-
-                        Nothing ->
-                            "None"
+                "Finde die aktuelle und historische Wassertemperatur an "
+                    ++ (model.sensors |> List.length |> toString)
+                    ++ " Standorten rund um den Zürichsee!"
             ]
         , div [ css [ position absolute, top (px 8), right (px 8) ] ]
             [ a
