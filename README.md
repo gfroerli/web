@@ -15,8 +15,7 @@ here's [another tutorial](https://www.elm-tutorial.org/).
 
 To install all dependencies:
 
-    npm install
-    elm-make
+    make setup
 
 Next, set up the required env vars:
 
@@ -26,7 +25,7 @@ Next, set up the required env vars:
 
 To build the application, just type
 
-    npm run build
+    make dist
 
 The output will be written to the `dist/` directory.
 
@@ -34,7 +33,7 @@ The output will be written to the `dist/` directory.
 
 To start the dev server:
 
-    npm run dev
+    make run
 
 Now visit [localhost:8000](http://localhost:8000/) in your browser
 to see the application.
@@ -43,7 +42,7 @@ to see the application.
 
 To run the tests:
 
-    npm test
+    make test
 
 
 <!-- Badges -->
