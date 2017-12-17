@@ -57,6 +57,22 @@ elmApp.ports.initializeMap.subscribe((pos) => {
     elmApp.ports.sensorsLoaded.subscribe(sensors => {
         console.debug('Map:', sensors.length, 'new sensors have been loaded.');
 
+        // Zoom to bounding box
+        const latitudes = sensors.map(s => s.pos.lat);
+        const longitudes = sensors.map(s => s.pos.lng);
+        const latMinMax = [Math.min(...latitudes), Math.max(...latitudes)];
+        const lngMinMax = [Math.min(...longitudes), Math.max(...longitudes)];
+        const latDelta = latMinMax[1] - latMinMax[0];
+        const lngDelta = lngMinMax[1] - lngMinMax[0];
+        map.fitBounds([[
+            lngMinMax[0] - lngDelta * 0.2,
+            latMinMax[0] - latDelta * 0.2,
+        ], [
+            lngMinMax[1] + lngDelta * 0.2,
+            latMinMax[1] + latDelta * 0.2,
+        ]]);
+
+        // Add marker for every sensor
         sensors.forEach(sensor => {
             // Create marker element
             const el = document.createElement('div');
