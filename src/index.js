@@ -28,9 +28,31 @@ elmApp.ports.initializeMap.subscribe((pos) => {
     });
 
     // Selected sensor element
+    const selectedClass = 'selected';
     const selectedSensor = {
         el: null,
         sensor: null,
+    };
+
+    // Helper functions for selecting / deselecting sensors
+    const deselectSensor = () => {
+        if (selectedSensor.el !== null) {
+            selectedSensor.el.classList.remove(selectedClass);
+        }
+        selectedSensor.sensor = null;
+        selectedSensor.el = null;
+        // Notify elm
+        elmApp.ports.sensorClicked.send(null);
+    };
+    const selectSensor = (sensor, el) => {
+        if (selectedSensor.el !== null) {
+            selectedSensor.el.classList.remove(selectedClass);
+        }
+        el.classList.add(selectedClass);
+        selectedSensor.el = el;
+        selectedSensor.sensor = sensor;
+        // Notify elm
+        elmApp.ports.sensorClicked.send(sensor);
     };
 
     // Initialize navigation control
@@ -98,19 +120,14 @@ elmApp.ports.initializeMap.subscribe((pos) => {
 
             // Add event listener
             el.addEventListener('click', (ev) => {
-                console.log('selected', selectedSensor);
-                console.log('el', el);
-                const selectedClass = 'selected';
-                elmApp.ports.sensorClicked.send(sensor);
-                if (selectedSensor.el !== null) {
-                    selectedSensor.el.classList.remove(selectedClass);
-                }
-                el.classList.add(selectedClass);
-                selectedSensor.el = el;
-                selectedSensor.sensor = sensor;
+                ev.stopPropagation();
+                selectSensor(sensor, el);
             });
         });
     });
+
+    // When clicking on map, deselect all markers
+    map.on('click', deselectSensor);
 
     // Subscribe to JS events
     map.on('moveend', (ev) => {
