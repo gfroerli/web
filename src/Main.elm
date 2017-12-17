@@ -1,19 +1,21 @@
 module Main exposing (..)
 
 import Api
-import Html
 import Html.Styled exposing (toUnstyled)
 import List.Extra exposing (find)
 import Map
 import MapPort
 import Messages exposing (..)
-import Models exposing (Model)
+import Models exposing (Model, Route(..))
+import Navigation
+import Navigation exposing (Location)
+import Routing exposing (parseLocation)
 import Views exposing (view)
 
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
+    Navigation.programWithFlags LocationChange
         { init = init
         , view = view >> toUnstyled
         , update = update
@@ -30,13 +32,21 @@ type alias Flags =
 -- MODEL
 
 
-init : Flags -> ( Model, Cmd Msg )
-init flags =
+init : Flags -> Location -> ( Model, Cmd Msg )
+init flags location =
     let
         map =
             Map.init
+
+        currentRoute =
+            parseLocation location
     in
-        ( Model map [] Nothing flags.apiToken
+        ( { route = currentRoute
+          , map = map
+          , sensors = []
+          , selectedSensor = Nothing
+          , apiToken = flags.apiToken
+          }
         , MapPort.initializeMap map
         )
 
@@ -48,6 +58,27 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        LocationChange location ->
+            let
+                -- Determine the new route by parsing the location
+                newRoute =
+                    parseLocation location
+
+                -- Determine any side effects (e.g. map init) caused by the location change
+                cmd =
+                    case newRoute of
+                        MapRoute ->
+                            -- Re-initialize map
+                            MapPort.initializeMap model.map
+
+                        AboutRoute ->
+                            Cmd.none
+
+                        NotFoundRoute ->
+                            Cmd.none
+            in
+                ( { model | route = newRoute }, cmd )
+
         MapInitialized _ ->
             ( model, Api.loadSensors model.apiToken )
 

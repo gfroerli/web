@@ -8,11 +8,32 @@ import Html.Styled exposing (Html)
 import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong, footer)
 import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
 import Messages exposing (..)
-import Models exposing (Model, Sensor)
+import Models exposing (Model, Sensor, Route(..))
+import Routing exposing (mapPath, aboutPath)
 
 
+{-| Root view.
+
+Decide which view to render based on the current route.
+
+-}
 view : Model -> Html Msg
 view model =
+    case model.route of
+        MapRoute ->
+            mapView model
+
+        AboutRoute ->
+            aboutView
+
+        NotFoundRoute ->
+            notFoundView
+
+
+{-| Wrap a list of HTML elements in a wrapper div with full height.
+-}
+page : String -> List (Html Msg) -> Html Msg
+page subtitle elements =
     div
         [ css
             [ minHeight (vh 100)
@@ -20,42 +41,85 @@ view model =
             , flexDirection column
             ]
         ]
-        [ Css.Reset.css
-        , Foreign.global
-            [ Foreign.body <| fontBody ++ [ fontSize (px 16) ]
-            , Foreign.id "main" [ minHeight (vh 100) ]
-            , Foreign.h1 <| fontHeading ++ [ fontSize (em 3.4) ]
-            , Foreign.h2 <| fontHeading ++ [ fontSize (em 2.2) ]
-            , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6) ]
-            , Foreign.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
-            , Foreign.p [ lineHeight (em 1.5) ]
-            , Foreign.strong [ fontWeight bold ]
-            , Foreign.class "marker"
-                [ backgroundImage (url "/static/marker.svg")
-                , backgroundSize cover
-                , width (px 32)
-                , height (px 32)
-                , lineHeight (px 32)
-                , cursor pointer
-                , textAlign center
-                , verticalAlign middle
-                , fontWeight bold
-                , fontSize (px 16)
-                , Foreign.withClass "selected"
-                    [ backgroundImage (url "/static/marker-selected.svg") ]
+        (List.append
+            [ Css.Reset.css
+            , Foreign.global
+                [ Foreign.body <| fontBody ++ [ fontSize (px 16) ]
+                , Foreign.id "main" [ minHeight (vh 100) ]
+                , Foreign.h1 <| fontHeading ++ [ fontSize (em 3.4) ]
+                , Foreign.h2 <| fontHeading ++ [ fontSize (em 2.2) ]
+                , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6) ]
+                , Foreign.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
+                , Foreign.p [ lineHeight (em 1.5) ]
+                , Foreign.strong [ fontWeight bold ]
+                , Foreign.class "marker"
+                    [ backgroundImage (url "/static/marker.svg")
+                    , backgroundSize cover
+                    , width (px 32)
+                    , height (px 32)
+                    , lineHeight (px 32)
+                    , cursor pointer
+                    , textAlign center
+                    , verticalAlign middle
+                    , fontWeight bold
+                    , fontSize (px 16)
+                    , Foreign.withClass "selected"
+                        [ backgroundImage (url "/static/marker-selected.svg") ]
+                    ]
                 ]
+            , div [ css [ width (pct 100), marginTop (px 16) ] ]
+                [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
+                , h2 [ css [ textAlign center ] ] [ text "Wassertemperaturen Schweiz" ]
+                ]
+            , p [ css [ textAlign center, margin2 (px 16) zero ] ]
+                [ text subtitle ]
             ]
-        , div [ css [ width (pct 100), marginTop (px 16) ] ]
-            [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
-            , h2 [ css [ textAlign center ] ] [ text "Wassertemperaturen Schweiz" ]
+            elements
+        )
+
+
+{-| View: Not found
+-}
+notFoundView : Html Msg
+notFoundView =
+    page
+        ""
+        [ div [ css [ width (pct 100), textAlign center ] ]
+            [ p
+                [ css [ fontSize (em 12) ] ]
+                [ text "404" ]
+            , p
+                [ css [ fontSize (em 1.2) ] ]
+                [ text "Es tut uns leid, aber die gewünschte Seite wurde nicht gefunden." ]
             ]
-        , p [ css [ textAlign center, margin2 (px 16) zero ] ]
-            [ text <|
-                "Finde die aktuelle und historische Wassertemperatur an "
-                    ++ (model.sensors |> List.length |> toString)
-                    ++ " Standorten rund um den Zürichsee!"
+        ]
+
+
+{-| View: About
+-}
+aboutView : Html Msg
+aboutView =
+    page
+        ""
+        [ div
+            [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
+            [ h2 [ css [ marginBottom (px 16) ] ] [ text "About" ]
+            , p [] [ text "Gfrör.li ist ein Projekt des Hackerspaces \"Coredump\" in Rapperswil-Jona." ]
+            , a [ href mapPath ] [ text "Zurück zur Karte" ]
             ]
-        , div [ css [ position absolute, top (px 8), right (px 8) ] ]
+        ]
+
+
+{-| View: Map
+-}
+mapView : Model -> Html Msg
+mapView model =
+    page
+        ("Finde die aktuelle und historische Wassertemperatur an "
+            ++ (model.sensors |> List.length |> toString)
+            ++ " Standorten rund um den Zürichsee!"
+        )
+        [ div [ css [ position absolute, top (px 8), right (px 8) ] ]
             [ a
                 [ href "https://play.google.com/apps/testing/ch.coredump.watertemp.zh" ]
                 [ img [ src "/static/google-play-badge.png" ] [] ]
@@ -108,6 +172,8 @@ view model =
                 ]
             ]
             [ text "© 2017 Coredump Rapperswil-Jona"
+            , text " | "
+            , a [ href aboutPath ] [ text "About" ]
             ]
         ]
 

@@ -5,11 +5,18 @@ import Map
 
 
 type alias Model =
-    { map : Map.Model
+    { route : Route
+    , map : Map.Model
     , sensors : List Sensor
     , selectedSensor : Maybe Sensor
     , apiToken : String
     }
+
+
+type Route
+    = MapRoute
+    | AboutRoute
+    | NotFoundRoute
 
 
 type alias Sensor =
