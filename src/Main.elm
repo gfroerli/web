@@ -4,6 +4,7 @@ import Api
 import Css exposing (..)
 import Css.Foreign as Foreign
 import Css.Reset
+import Helpers exposing (formatTemperature)
 import Html
 import Html.Styled exposing (Html, toUnstyled)
 import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong)
@@ -221,8 +222,38 @@ sensorDescription : Sensor -> Html Msg
 sensorDescription sensor =
     div []
         [ Maybe.withDefault
-            (p [] [ text "Keine Beschreibung" ])
-            (Maybe.map (\s -> (p [] [ text s ])) sensor.caption)
+            -- Fallback if there is no caption
+            (p
+                [ css [ fontStyle italic ] ]
+                [ text "Keine Beschreibung" ]
+            )
+            -- Extract and show caption
+            (Maybe.map
+                (\s ->
+                    (p
+                        [ css [ fontStyle normal ] ]
+                        [ text s ]
+                    )
+                )
+                sensor.caption
+            )
+        , h3 [] [ text "Letzte Messung" ]
+        , Maybe.withDefault
+            -- Fallback if there is no measurement
+            (p
+                [ css [ fontStyle italic ] ]
+                [ text "Keine Messung" ]
+            )
+            -- Extract and show last measurement
+            (Maybe.map
+                (\m ->
+                    (p
+                        [ css [ fontStyle normal ] ]
+                        [ text (formatTemperature m.temperature) ]
+                    )
+                )
+                sensor.lastMeasurement
+            )
         ]
 
 
