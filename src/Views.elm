@@ -9,7 +9,7 @@ import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, stron
 import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
 import Messages exposing (..)
 import Models exposing (Model, Sensor, Route(..))
-import Routing exposing (mapPath, aboutPath)
+import Routing
 
 
 {-| Root view.
@@ -105,7 +105,12 @@ aboutView =
             [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
             [ h2 [ css [ marginBottom (px 16) ] ] [ text "About" ]
             , p [] [ text "Gfrör.li ist ein Projekt des Hackerspaces \"Coredump\" in Rapperswil-Jona." ]
-            , a [ href mapPath ] [ text "Zurück zur Karte" ]
+            , p []
+                [ text "Der Quellcode dieser Webapp steht unter einer freien Lizenz und kann "
+                , a [ href Routing.githubPath ] [ text "auf Github" ]
+                , text " eingesehen und verbessert werden!"
+                ]
+            , a [ href Routing.mapPath ] [ text "Zurück zur Karte" ]
             ]
         ]
 
@@ -173,7 +178,9 @@ mapView model =
             ]
             [ text "© 2017 Coredump Rapperswil-Jona"
             , text " | "
-            , a [ href aboutPath ] [ text "About" ]
+            , a [ href Routing.aboutPath ] [ text "About" ]
+            , text " | "
+            , a [ href Routing.githubPath ] [ text "Code on Github" ]
             ]
         ]
 

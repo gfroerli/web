@@ -1,4 +1,4 @@
-module Routing exposing (parseLocation, mapPath, aboutPath)
+module Routing exposing (parseLocation, mapPath, aboutPath, githubPath)
 
 import Models exposing (Route(..))
 import Navigation exposing (Location)
@@ -31,3 +31,8 @@ mapPath =
 aboutPath : String
 aboutPath =
     "#/about"
+
+
+githubPath : String
+githubPath =
+    "https://github.com/coredump-ch/water-sensor-web"
