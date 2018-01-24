@@ -44,6 +44,16 @@ To run the tests:
 
     make test
 
+## Changing Code
+
+The entry point of the application is in `src/Main.elm`. The application is
+injected into a HTML page in `src/index.html`. The non-Elm scripting is done in
+`src/index.js`, and bridged to Elm using the
+[port system](https://guide.elm-lang.org/interop/javascript.html).
+
+Contributions are welcome. If you need any guidance, feel free to create an
+issue on Github or join our IRC channel #coredump on Freenode!
+
 
 <!-- Badges -->
 [circle-ci]: https://circleci.com/gh/coredump-ch/water-sensor-web/tree/master
