@@ -2,6 +2,7 @@ module Models exposing (..)
 
 import Date exposing (Date)
 import Map
+import Time
 
 
 type alias Model =
@@ -10,6 +11,7 @@ type alias Model =
     , sensors : List Sensor
     , selectedSensor : Maybe Sensor
     , apiToken : String
+    , time : Maybe Time.Time
     }
 
 

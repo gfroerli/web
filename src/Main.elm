@@ -10,6 +10,8 @@ import Models exposing (Model, Route(..))
 import Navigation
 import Navigation exposing (Location)
 import Routing exposing (parseLocation)
+import Task
+import Time
 import Views exposing (view)
 
 
@@ -46,8 +48,12 @@ init flags location =
           , sensors = []
           , selectedSensor = Nothing
           , apiToken = flags.apiToken
+          , time = Nothing
           }
-        , MapPort.initializeMap map
+        , Cmd.batch
+            [ MapPort.initializeMap map
+            , Task.perform TimeUpdate Time.now
+            ]
         )
 
 
@@ -58,6 +64,9 @@ init flags location =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        TimeUpdate newTime ->
+            ( { model | time = Just newTime }, Cmd.none )
+
         LocationChange location ->
             let
                 -- Determine the new route by parsing the location
@@ -130,4 +139,5 @@ subscriptions model =
         [ MapPort.mapInitialized MapInitialized
         , MapPort.mapMoved MapDragged
         , MapPort.sensorClicked SensorClicked
+        , Time.every (30 * Time.second) TimeUpdate
         ]

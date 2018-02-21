@@ -4,6 +4,7 @@ import Http
 import Map
 import Models
 import Navigation exposing (Location)
+import Time
 
 
 type Msg
@@ -12,3 +13,4 @@ type Msg
     | MapDragged Map.Model
     | DataLoaded (Result Http.Error (List Models.Sensor))
     | SensorClicked (Maybe Models.JsSensor)
+    | TimeUpdate Time.Time
