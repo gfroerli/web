@@ -82,7 +82,7 @@ update msg model =
         MapInitialized _ ->
             ( model, Api.loadSensors model.apiToken )
 
-        DataLoaded result ->
+        SensorsLoaded result ->
             case result of
                 Ok sensors ->
                     ( { model | selectedSensor = Nothing, sensors = sensors }

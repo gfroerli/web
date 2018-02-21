@@ -1,5 +1,6 @@
 module Api exposing (..)
 
+import Date
 import Http
 import Json.Decode as Decode
 import Json.Decode.Extra as DecodeExtra
@@ -90,4 +91,30 @@ loadSensors apiToken =
                 , withCredentials = False
                 }
     in
-        Http.send DataLoaded request
+        Http.send SensorsLoaded request
+
+
+loadSensorMeasurements : String -> Int -> Int -> Cmd Msg
+loadSensorMeasurements apiToken sensorId secondsAgo =
+    let
+        createdAfter =
+            Date.fromTime <| Time.now - ((toFloat secondsAgo) * Time.second)
+
+        url =
+            "https://watertemp-api.coredump.ch/api/measurements?sensorId="
+                ++ (toString sensorId)
+                ++ "&createdAfter="
+                ++ createdAfter
+
+        request =
+            Http.request
+                { method = "GET"
+                , headers = getHeaders apiToken
+                , url = url
+                , body = Http.emptyBody
+                , expect = Http.expectJson (Decode.list measurementDecoder)
+                , timeout = Just (30 * Time.second)
+                , withCredentials = False
+                }
+    in
+        Http.send MeasurementsLoaded request

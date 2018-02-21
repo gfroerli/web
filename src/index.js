@@ -78,6 +78,7 @@ elmApp.ports.initializeMap.subscribe((pos) => {
     // When new sensors are loaded, display them
     elmApp.ports.sensorsLoaded.subscribe(sensors => {
         console.debug('Map:', sensors.length, 'new sensors have been loaded.');
+        console.log(sensors);
 
         // Zoom to bounding box
         const latitudes = sensors.map(s => s.pos.lat);
