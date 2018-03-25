@@ -227,7 +227,7 @@ sensorDescription sensor =
                 (\measurement ->
                     (p
                         [ css [ fontStyle normal ] ]
-                        [ text (formatTemperature measurement.temperature) ]
+                        [ text (measurement.temperature |> toString |> formatTemperature) ]
                     )
                 )
                 sensor.lastMeasurement

@@ -157,7 +157,7 @@ suite =
                                 (Expect.all
                                     [ \measurement -> Expect.equal measurement.id 1
                                     , \measurement -> Expect.equal measurement.sensorId (Just 3)
-                                    , \measurement -> Expect.equal measurement.temperature "27.3"
+                                    , \measurement -> Expect.equal measurement.temperature 27.3
                                     ]
                                 )
                                 result

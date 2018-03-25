@@ -18,6 +18,7 @@ run:
 
 clean:
 	rm -rf dist/
+	rm -rf elm-stuff/
 
 dist: clean
 	npm run build
