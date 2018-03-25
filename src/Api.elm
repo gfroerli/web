@@ -102,9 +102,9 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
             Date.fromTime <| now - ((toFloat secondsAgo) * Time.second)
 
         url =
-            "https://watertemp-api.coredump.ch/api/measurements?sensorId="
+            "https://watertemp-api.coredump.ch/api/measurements?sensor_id="
                 ++ (toString sensorId)
-                ++ "&createdAfter="
+                ++ "&created_after="
                 ++ (Date.Format.formatISO8601 createdAfter)
 
         request =
