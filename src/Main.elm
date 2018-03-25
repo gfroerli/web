@@ -5,6 +5,7 @@ import Html.Styled exposing (toUnstyled)
 import List.Extra exposing (find)
 import Map
 import MapPort
+import Maybe.Extra
 import Messages exposing (..)
 import Models exposing (Model, Route(..))
 import Navigation
@@ -105,18 +106,32 @@ update msg model =
             in
                 ( model, Cmd.none )
 
-        MeasurementsLoaded (Ok measurements) ->
+        MeasurementsLoaded ( sensorId, Ok measurements ) ->
             let
-                _ =
-                    Debug.log "Measurements" measurements
-            in
-                ( model, Cmd.none )
+                -- Get selected sensor if the sensor id in the received
+                -- measurements matches its id.
+                sensor =
+                    Maybe.Extra.filter (\sensor -> sensor.id == sensorId) model.selectedSensor
 
-        MeasurementsLoaded (Err error) ->
+                updatedModel =
+                    case sensor of
+                        Just sensor ->
+                            let
+                                updatedSensor =
+                                    { sensor | historicMeasurements = Just measurements }
+                            in
+                                { model | selectedSensor = Just updatedSensor }
+
+                        Nothing ->
+                            model
+            in
+                ( updatedModel, Cmd.none )
+
+        MeasurementsLoaded ( sensorId, Err error ) ->
             let
                 _ =
                     -- TODO
-                    Debug.log "Error while fetching measurements" error
+                    Debug.log ("Error while fetching measurements for sensor " ++ (toString sensorId)) error
             in
                 ( model, Cmd.none )
 

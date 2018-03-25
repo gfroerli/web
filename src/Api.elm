@@ -36,6 +36,7 @@ sensorDecoder =
         |> Pipeline.required "created_at" DecodeExtra.date
         |> Pipeline.required "updated_at" DecodeExtra.date
         |> Pipeline.optional "last_measurement" (Decode.nullable measurementDecoder) Nothing
+        |> Pipeline.hardcoded Nothing
 
 
 measurementDecoder : Decode.Decoder Measurement
@@ -117,4 +118,4 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
                 , withCredentials = False
                 }
     in
-        Http.send MeasurementsLoaded request
+        Http.send (\res -> (MeasurementsLoaded ( sensorId, res ))) request

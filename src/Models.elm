@@ -31,6 +31,7 @@ type alias Sensor =
     , createdAt : Date
     , updatedAt : Date
     , lastMeasurement : Maybe Measurement
+    , historicMeasurements : Maybe (List Measurement)
     }
 
 
