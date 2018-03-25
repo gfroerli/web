@@ -48,7 +48,6 @@ type alias Measurement =
     , sensorId : Maybe Int
     , temperature : String
     , createdAt : Date
-    , updatedAt : Date
     }
 
 

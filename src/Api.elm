@@ -45,7 +45,6 @@ measurementDecoder =
         |> Pipeline.required "sensor_id" (Decode.nullable Decode.int)
         |> Pipeline.required "temperature" Decode.string
         |> Pipeline.required "created_at" DecodeExtra.date
-        |> Pipeline.required "updated_at" DecodeExtra.date
 
 
 
