@@ -91,26 +91,32 @@ update msg model =
         MapInitialized _ ->
             ( model, Api.loadSensors model.apiToken )
 
-        SensorsLoaded result ->
-            case result of
-                Ok sensors ->
-                    ( { model | selectedSensor = Nothing, sensors = sensors }
-                    , List.map Api.toJsSensor sensors
-                        |> MapPort.sensorsLoaded
-                    )
+        SensorsLoaded (Ok sensors) ->
+            ( { model | selectedSensor = Nothing, sensors = sensors }
+            , List.map Api.toJsSensor sensors
+                |> MapPort.sensorsLoaded
+            )
 
-                Err error ->
-                    let
-                        _ =
-                            -- TODO
-                            Debug.log "Error while fetching data" error
-                    in
-                        ( model, Cmd.none )
-
-        MeasurementsLoaded result ->
+        SensorsLoaded (Err error) ->
             let
                 _ =
-                    Debug.log "Measurements" result
+                    -- TODO
+                    Debug.log "Error while fetching data" error
+            in
+                ( model, Cmd.none )
+
+        MeasurementsLoaded (Ok measurements) ->
+            let
+                _ =
+                    Debug.log "Measurements" measurements
+            in
+                ( model, Cmd.none )
+
+        MeasurementsLoaded (Err error) ->
+            let
+                _ =
+                    -- TODO
+                    Debug.log "Error while fetching measurements" error
             in
                 ( model, Cmd.none )
 
