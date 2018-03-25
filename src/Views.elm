@@ -232,6 +232,28 @@ sensorDescription sensor =
                 )
                 sensor.lastMeasurement
             )
+        , h3 [] [ text "Temperaturverlauf (3 Tage)" ]
+        , Maybe.withDefault
+            -- Fallback if there are no historic measurements
+            (p
+                [ css [ fontStyle italic ] ]
+                [ text "Temperaturverlauf wird geladen..." ]
+            )
+            -- Extract and show historic measurements
+            (Maybe.map
+                (\measurements ->
+                    (p
+                        [ css [ fontStyle normal ] ]
+                        [ let
+                            temperatures =
+                                List.map (\m -> m.temperature) measurements
+                          in
+                            text (temperatures |> List.map toString |> String.join ", ")
+                        ]
+                    )
+                )
+                sensor.historicMeasurements
+            )
         ]
 
 
