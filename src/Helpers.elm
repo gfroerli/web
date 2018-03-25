@@ -20,9 +20,10 @@ If the number is an invalid decimal (e.g. if it has two periods in it), the
 string "invalid" is returned.
 
 -}
-formatTemperature : String -> String
+formatTemperature : Float -> String
 formatTemperature temp =
-    case primitiveRound temp 2 of
+    -- TODO: Use proper float rounding
+    case primitiveRound (toString temp) 2 of
         Just t ->
             t ++ "°C"
 

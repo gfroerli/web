@@ -47,11 +47,11 @@ type alias JsSensor =
 type alias Measurement =
     { id : Int
     , sensorId : Maybe Int
-    , temperature : String
+    , temperature : Float
     , createdAt : Date
     }
 
 
 type alias JsMeasurement =
-    { temperature : String
+    { temperature : Float
     }

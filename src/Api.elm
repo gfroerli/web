@@ -39,12 +39,28 @@ sensorDecoder =
         |> Pipeline.hardcoded Nothing
 
 
+{-| Parse a string as float. Fail if parsing does not succeed.
+-}
+floatAsStringDecoder : Decode.Decoder Float
+floatAsStringDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\str ->
+                case (String.toFloat str) of
+                    Ok parsed ->
+                        Decode.succeed parsed
+
+                    Err e ->
+                        Decode.fail "Could not parse string value as float"
+            )
+
+
 measurementDecoder : Decode.Decoder Measurement
 measurementDecoder =
     Pipeline.decode Measurement
         |> Pipeline.required "id" Decode.int
         |> Pipeline.required "sensor_id" (Decode.nullable Decode.int)
-        |> Pipeline.required "temperature" Decode.string
+        |> Pipeline.required "temperature" floatAsStringDecoder
         |> Pipeline.required "created_at" DecodeExtra.date
 
 

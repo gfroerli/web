@@ -224,10 +224,10 @@ sensorDescription sensor =
             )
             -- Extract and show last measurement
             (Maybe.map
-                (\m ->
+                (\measurement ->
                     (p
                         [ css [ fontStyle normal ] ]
-                        [ text (formatTemperature m.temperature) ]
+                        [ text (formatTemperature measurement.temperature) ]
                     )
                 )
                 sensor.lastMeasurement
