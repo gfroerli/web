@@ -91,7 +91,7 @@ update msg model =
         MapInitialized _ ->
             ( model, Api.loadSensors model.apiToken )
 
-        DataLoaded result ->
+        SensorsLoaded result ->
             case result of
                 Ok sensors ->
                     ( { model | selectedSensor = Nothing, sensors = sensors }
@@ -106,6 +106,13 @@ update msg model =
                             Debug.log "Error while fetching data" error
                     in
                         ( model, Cmd.none )
+
+        MeasurementsLoaded result ->
+            let
+                _ =
+                    Debug.log "Measurements" result
+            in
+                ( model, Cmd.none )
 
         MapDragged pos ->
             let
@@ -126,8 +133,20 @@ update msg model =
                 selectedSensor =
                     find (\sensor -> sensor.id == jsSensor.id)
                         model.sensors
+
+                cmd =
+                    case ( model.time, selectedSensor ) of
+                        ( Just now, Just sensor ) ->
+                            Api.loadSensorMeasurements
+                                model.apiToken
+                                now
+                                sensor.id
+                                (3600 * 24 * 3)
+
+                        _ ->
+                            Cmd.none
             in
-                ( { model | selectedSensor = selectedSensor }, Cmd.none )
+                ( { model | selectedSensor = selectedSensor }, cmd )
 
         SensorClicked Nothing ->
             ( { model | selectedSensor = Nothing }, Cmd.none )

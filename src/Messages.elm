@@ -11,6 +11,7 @@ type Msg
     = LocationChange Location
     | MapInitialized ()
     | MapDragged Map.Model
-    | DataLoaded (Result Http.Error (List Models.Sensor))
+    | SensorsLoaded (Result Http.Error (List Models.Sensor))
     | SensorClicked (Maybe Models.JsSensor)
+    | MeasurementsLoaded (Result Http.Error (List Models.Measurement))
     | TimeUpdate Time.Time
