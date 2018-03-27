@@ -1,10 +1,11 @@
 module Views exposing (view)
 
+import Charts exposing (temperatureChart)
 import Css exposing (..)
 import Css.Foreign as Foreign
 import Css.Reset
 import Helpers exposing (formatTemperature)
-import Html.Styled exposing (Html)
+import Html.Styled exposing (Html, fromUnstyled)
 import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong, footer)
 import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
 import Messages exposing (..)
@@ -242,15 +243,7 @@ sensorDescription sensor =
             -- Extract and show historic measurements
             (Maybe.map
                 (\measurements ->
-                    (p
-                        [ css [ fontStyle normal ] ]
-                        [ let
-                            temperatures =
-                                List.map (\m -> m.temperature) measurements
-                          in
-                            text (temperatures |> List.map toString |> String.join ", ")
-                        ]
-                    )
+                    fromUnstyled <| temperatureChart measurements
                 )
                 sensor.historicMeasurements
             )
