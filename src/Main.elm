@@ -50,7 +50,7 @@ init flags location =
           , sensors = []
           , selectedSensor = Nothing
           , apiToken = flags.apiToken
-          , time = Nothing
+          , now = Nothing
           }
         , Cmd.batch
             [ MapPort.initializeMap map
@@ -67,7 +67,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TimeUpdate newTime ->
-            ( { model | time = Just newTime }, Cmd.none )
+            ( { model | now = Just newTime }, Cmd.none )
 
         LocationChange location ->
             let
@@ -160,7 +160,7 @@ update msg model =
                         model.sensors
 
                 cmd =
-                    case ( model.time, selectedSensor ) of
+                    case ( model.now, selectedSensor ) of
                         ( Just now, Just sensor ) ->
                             Api.loadSensorMeasurements
                                 model.apiToken

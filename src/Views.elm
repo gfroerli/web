@@ -11,6 +11,7 @@ import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
 import Messages exposing (..)
 import Models exposing (Model, Sensor, Route(..))
 import Routing
+import Time exposing (Time)
 
 
 {-| Root view.
@@ -193,12 +194,12 @@ sidebarContents model =
         [ text <| Maybe.withDefault "Details" (Maybe.map .deviceName model.selectedSensor) ]
     , Maybe.withDefault
         (p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ])
-        (Maybe.map sensorDescription model.selectedSensor)
+        (Maybe.map (\s -> sensorDescription model.now s) model.selectedSensor)
     ]
 
 
-sensorDescription : Sensor -> Html Msg
-sensorDescription sensor =
+sensorDescription : Maybe Time -> Sensor -> Html Msg
+sensorDescription now sensor =
     div []
         [ Maybe.withDefault
             -- Fallback if there is no caption
@@ -243,7 +244,7 @@ sensorDescription sensor =
             -- Extract and show historic measurements
             (Maybe.map
                 (\measurements ->
-                    fromUnstyled <| temperatureChart measurements
+                    fromUnstyled <| temperatureChart now measurements
                 )
                 sensor.historicMeasurements
             )
