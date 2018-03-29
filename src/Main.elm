@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Api
+import Date exposing (toTime)
 import Html.Styled exposing (toUnstyled)
 import List.Extra exposing (find)
 import Map
@@ -117,8 +118,11 @@ update msg model =
                     case sensor of
                         Just sensor ->
                             let
+                                sortedMeasurements =
+                                    List.sortBy (.createdAt >> toTime) measurements
+
                                 updatedSensor =
-                                    { sensor | historicMeasurements = Just measurements }
+                                    { sensor | historicMeasurements = Just sortedMeasurements }
                             in
                                 { model | selectedSensor = Just updatedSensor }
 
