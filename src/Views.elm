@@ -244,7 +244,14 @@ sensorDescription now sensor =
             -- Extract and show historic measurements
             (Maybe.map
                 (\measurements ->
-                    fromUnstyled <| temperatureChart now measurements
+                    case measurements of
+                        [] ->
+                            p
+                                [ css [ fontStyle italic ] ]
+                                [ text "No recent measurements" ]
+
+                        mm ->
+                            fromUnstyled <| temperatureChart now mm
                 )
                 sensor.historicMeasurements
             )
