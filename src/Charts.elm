@@ -1,6 +1,5 @@
 module Charts exposing (temperatureChart)
 
-import Color
 import Date exposing (toTime)
 import Html exposing (Html)
 import LineChart
@@ -87,9 +86,9 @@ temperatureChart now measurements =
             , legends = Legends.none
             , events = Events.default
             , junk = Junk.default
-            , grid = Grid.default
+            , grid = Grid.lines 0.5 Colors.grayLight
             , area = Area.default
             , line = Line.wider 2
             , dots = Dots.custom (Dots.full 0)
             }
-            [ LineChart.line Color.red Dots.circle "Foo" measurements ]
+            [ LineChart.line Colors.blue Dots.circle "Temperature" measurements ]
