@@ -80,7 +80,14 @@ temperatureChart now measurements =
                     , axisLine = AxisLine.full Colors.black
                     , ticks = Ticks.time tickCount
                     }
-            , container = Container.responsive "line-chart-1"
+            , container =
+                Container.custom
+                    { attributesHtml = []
+                    , attributesSvg = []
+                    , size = Container.relative
+                    , margin = Container.Margin 10 10 60 50
+                    , id = "line-chart-30d"
+                    }
             , interpolation = Interpolation.default
             , intersection = Intersection.default
             , legends = Legends.none
