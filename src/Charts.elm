@@ -44,6 +44,31 @@ temperatureChart now measurements =
 
                 Nothing ->
                     Range.padded 20 20
+
+        -- We want to determine the number of ticks to show on the x axis
+        -- depending on the amount of available data.
+        -- Scale the number of ticks to ensure that the values are still readable.
+        tickCount =
+            case ( now, List.head measurements ) of
+                ( Just timestamp, Just measurement ) ->
+                    let
+                        hoursOfData =
+                            (timestamp - toTime measurement.createdAt)
+                                |> Time.inHours
+                    in
+                        if hoursOfData > 60 then
+                            5
+                        else if hoursOfData > 48 then
+                            4
+                        else if hoursOfData > 36 then
+                            3
+                        else if hoursOfData > 24 then
+                            2
+                        else
+                            1
+
+                _ ->
+                    0
     in
         LineChart.viewCustom
             { y = Axis.default 300 "°C" .temperature
@@ -54,7 +79,7 @@ temperatureChart now measurements =
                     , pixels = 450
                     , range = range
                     , axisLine = AxisLine.full Colors.black
-                    , ticks = Ticks.time 5
+                    , ticks = Ticks.time tickCount
                     }
             , container = Container.responsive "line-chart-1"
             , interpolation = Interpolation.default
@@ -64,7 +89,7 @@ temperatureChart now measurements =
             , junk = Junk.default
             , grid = Grid.default
             , area = Area.default
-            , line = Line.wider 3
+            , line = Line.wider 2
             , dots = Dots.custom (Dots.full 0)
             }
             [ LineChart.line Color.red Dots.circle "Foo" measurements ]
