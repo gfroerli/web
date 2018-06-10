@@ -84,8 +84,8 @@ elmApp.ports.initializeMap.subscribe((pos) => {
         const longitudes = sensors.map(s => s.pos.lng);
         const latMinMax = [Math.min(...latitudes), Math.max(...latitudes)];
         const lngMinMax = [Math.min(...longitudes), Math.max(...longitudes)];
-        const latDelta = latMinMax[1] - latMinMax[0];
-        const lngDelta = lngMinMax[1] - lngMinMax[0];
+        const latDelta = Math.max(0.01, latMinMax[1] - latMinMax[0]);
+        const lngDelta = Math.max(0.01, lngMinMax[1] - lngMinMax[0]);
         map.fitBounds([[
             lngMinMax[0] - lngDelta * 0.2,
             latMinMax[0] - latDelta * 0.2,
