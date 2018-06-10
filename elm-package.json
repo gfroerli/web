@@ -1,7 +1,7 @@
 {
     "version": "0.1.0",
     "summary": "Web app showing the gfrör.li water temperature sensor data.",
-    "repository": "https://github.com/coredump-ch/water-sensor-web.git",
+    "repository": "https://github.com/gfroerli/web.git",
     "license": "AGPLv3",
     "source-directories": [
         "src"
