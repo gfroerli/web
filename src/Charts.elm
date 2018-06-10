@@ -70,14 +70,30 @@ temperatureChart now measurements =
                     0
     in
         LineChart.viewCustom
-            { y = Axis.default 300 "°C" .temperature
+            { y =
+                Axis.custom
+                    { title = Title.default ""
+                    , variable = Just << .temperature
+                    , pixels = 300
+                    , range = Range.padded 20 20
+                    , axisLine =
+                        AxisLine.custom <|
+                            \dataRange axisRange ->
+                                { color = Colors.grayLight
+                                , width = 3
+                                , events = []
+                                , start = dataRange.min
+                                , end = dataRange.max
+                                }
+                    , ticks = Ticks.default
+                    }
             , x =
                 Axis.custom
                     { title = Title.default ""
                     , variable = Just << toTime << .createdAt
-                    , pixels = 450
+                    , pixels = 500
                     , range = range
-                    , axisLine = AxisLine.full Colors.black
+                    , axisLine = AxisLine.none
                     , ticks = Ticks.time tickCount
                     }
             , container =
@@ -93,7 +109,7 @@ temperatureChart now measurements =
             , legends = Legends.none
             , events = Events.default
             , junk = Junk.default
-            , grid = Grid.lines 0.5 Colors.grayLight
+            , grid = Grid.lines 0.75 Colors.grayLight
             , area = Area.default
             , line = Line.wider 2
             , dots = Dots.custom (Dots.full 0)
