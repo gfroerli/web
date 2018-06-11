@@ -11,17 +11,25 @@ jobs:
             - v3-cache-{{ arch }}-{{ .Branch }}
             - v3-cache-{{ arch }}
       - run:
+          name: Install sysconfcpus to fix core count detection
+          command: |
+            git clone https://github.com/obmarg/libsysconfcpus.git;
+            cd libsysconfcpus;
+            ./configure;
+            make && make install;
+            cd ..;
+      - run:
           name: Install npm dependencies
           command: npm install
       - run:
           name: Install elm dependencies
-          command: elm-make --yes
+          command: sysconfcpus -n 2 elm-make --yes
       - run:
           name: Build project
-          command: make dist
+          command: sysconfcpus -n 2 make dist
       - run:
           name: Test project
-          command: make test
+          command: sysconfcpus -n 2 make test
       - save_cache:
           key:  v3-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
           paths:
