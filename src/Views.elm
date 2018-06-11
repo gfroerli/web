@@ -117,6 +117,14 @@ aboutView =
         ]
 
 
+pluralize : String -> String -> Int -> String
+pluralize singular plural quantity =
+    if quantity == 1 then
+        singular
+    else
+        plural
+
+
 {-| View: Map
 -}
 mapView : Model -> Html Msg
@@ -124,7 +132,8 @@ mapView model =
     page
         ("Finde die aktuelle und historische Wassertemperatur an "
             ++ (model.sensors |> List.length |> toString)
-            ++ " Standorten rund um den Zürichsee!"
+            ++ (pluralize " Standort" " Standorten" (model.sensors |> List.length))
+            ++ " rund um den Zürichsee!"
         )
         [ div [ css [ position absolute, top (px 8), right (px 8) ] ]
             [ a
