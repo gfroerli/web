@@ -11,7 +11,7 @@ type alias Model =
     , sensors : List Sensor
     , selectedSensor : Maybe Sensor
     , apiToken : String
-    , time : Maybe Time.Time
+    , now : Maybe Time.Time
     }
 
 
