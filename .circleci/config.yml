@@ -13,14 +13,11 @@ jobs:
       - run:
           name: Install sysconfcpus to fix core count detection
           command: |
-            if [ ! -d sysconfcpus/bin ];
-            then
-              git clone https://github.com/obmarg/libsysconfcpus.git;
-              cd libsysconfcpus;
-              ./configure;
-              make && make install;
-              cd ..;
-            fi
+            git clone https://github.com/obmarg/libsysconfcpus.git;
+            cd libsysconfcpus;
+            ./configure;
+            make && make install;
+            cd ..;
       - run:
           name: Install npm dependencies
           command: npm install
