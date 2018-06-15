@@ -48,11 +48,11 @@ page subtitle elements =
             , Foreign.global
                 [ Foreign.body <| fontBody ++ [ fontSize (px 16) ]
                 , Foreign.id "main" [ minHeight (vh 100) ]
-                , Foreign.h1 <| fontHeading ++ [ fontSize (em 3.4) ]
-                , Foreign.h2 <| fontHeading ++ [ fontSize (em 2.2) ]
-                , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6) ]
+                , Foreign.h1 <| fontHeading ++ [ fontSize (em 3.4), marginBottom (px 16) ]
+                , Foreign.h2 <| fontHeading ++ [ fontSize (em 2.2), marginBottom (px 8) ]
+                , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6), marginBottom (px 8) ]
                 , Foreign.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
-                , Foreign.p [ lineHeight (em 1.5) ]
+                , Foreign.p [ lineHeight (em 1.5), marginBottom (px 8) ]
                 , Foreign.strong [ fontWeight bold ]
                 , Foreign.class "marker"
                     [ backgroundImage (url "/static/marker.svg")
@@ -105,14 +105,29 @@ aboutView =
         ""
         [ div
             [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
-            [ h2 [ css [ marginBottom (px 16) ] ] [ text "About" ]
-            , p [] [ text "Gfrör.li ist ein Projekt des Hackerspaces \"Coredump\" in Rapperswil-Jona." ]
+            [ h2 [] [ text "About" ]
+            , h3 [ css [ marginTop (px 16) ] ] [ text "Warum dieses Projekt?" ]
+            , p [] [ text "Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es keine verlässliche Methode, um Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten." ]
+            , p [] [ text "Es gibt heute bereits ein paar Wassertemperatur-Sensor-Netzwerke, aber meistens gibt es nur einen Sensor pro See, wodurch lokale Temperaturunterschiede (z.B. an einer Flussmündung) ignoriert werden. Viele Sensoren werden zudem nur ein mal pro Tag publiziert." ]
+            , p [] [ text "Wir bauen ein Netzwerk von kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf.  Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen." ]
             , p []
                 [ text "Der Quellcode dieser Webapp steht unter einer freien Lizenz und kann "
                 , a [ href Routing.githubPath ] [ text "auf Github" ]
                 , text " eingesehen und verbessert werden!"
                 ]
-            , a [ href Routing.mapPath ] [ text "Zurück zur Karte" ]
+            , h3 [ css [ marginTop (px 16) ] ] [ text "Wer hat diese Website entwickelt?" ]
+            , p [] [ text "Diese Website, die Server-Infrastruktur wie auch die Sensor-Hardware werden vom Coredump Hackerspace in Rapperswil-Jona entwickelt." ]
+            , p []
+                [ text "Mehr Informationen über uns findest du auf unserer Website: "
+                , a [ href Routing.coredumpPath ] [ text "www.coredump.ch" ]
+                ]
+            , h3 [ css [ marginTop (px 16) ] ] [ text "Wie kann ich selber so einen Sensor platzieren?" ]
+            , p []
+                [ text "Kontaktiere uns doch unter "
+                , a [ href "mailto:gfroerli@coredump.ch" ] [ text "gfroerli@coredump.ch" ]
+                , text "!"
+                ]
+            , a [ href Routing.mapPath, css [ display inlineBlock, marginTop (px 32) ] ] [ text "Zurück zur Karte" ]
             ]
         ]
 
