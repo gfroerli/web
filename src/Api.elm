@@ -8,7 +8,7 @@ import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
 import Map
 import Messages exposing (..)
-import Models exposing (Sensor, JsSensor, Measurement, JsMeasurement)
+import Models exposing (Sensor, Sponsor, JsSensor, Measurement, JsMeasurement)
 import Time
 
 
@@ -37,6 +37,14 @@ sensorDecoder =
         |> Pipeline.required "updated_at" DecodeExtra.date
         |> Pipeline.optional "last_measurement" (Decode.nullable measurementDecoder) Nothing
         |> Pipeline.hardcoded Nothing
+
+
+sponsorDecoder : Decode.Decoder Sponsor
+sponsorDecoder =
+    Pipeline.decode Sponsor
+        |> Pipeline.required "name" Decode.string
+        |> Pipeline.optional "description" Decode.string ""
+        |> Pipeline.optional "active" Decode.bool False
 
 
 {-| Parse a string as float. Fail if parsing does not succeed.
@@ -135,3 +143,24 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
                 }
     in
         Http.send (\res -> (MeasurementsLoaded ( sensorId, res ))) request
+
+
+loadSponsor : String -> Int -> Cmd Msg
+loadSponsor apiToken sponsorId =
+    let
+        url =
+            "https://watertemp-api.coredump.ch/api/sponsors/"
+                ++ (toString sponsorId)
+
+        request =
+            Http.request
+                { method = "GET"
+                , headers = getHeaders apiToken
+                , url = url
+                , body = Http.emptyBody
+                , expect = Http.expectJson sponsorDecoder
+                , timeout = Just (30 * Time.second)
+                , withCredentials = False
+                }
+    in
+        Http.send (\res -> (SponsorLoaded ( sponsorId, res ))) request

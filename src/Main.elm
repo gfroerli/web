@@ -109,6 +109,21 @@ update msg model =
             in
                 ( model, Cmd.none )
 
+        SponsorLoaded ( sponsorId, Ok sponsor ) ->
+            let
+                updatedSponsors =
+                    Dict.insert sponsorId sponsor model.sponsors
+            in
+                ( { model | sponsors = updatedSponsors }, Cmd.none )
+
+        SponsorLoaded ( sponsorId, Err error ) ->
+            let
+                _ =
+                    -- TODO
+                    Debug.log "Error while fetching sponsor" error
+            in
+                ( model, Cmd.none )
+
         MeasurementsLoaded ( sensorId, Ok measurements ) ->
             let
                 -- Get selected sensor if the sensor id in the received
@@ -161,7 +176,7 @@ update msg model =
                     find (\sensor -> sensor.id == jsSensor.id)
                         model.sensors
 
-                cmd =
+                cmdMeasurements =
                     case ( model.now, selectedSensor ) of
                         ( Just now, Just sensor ) ->
                             Api.loadSensorMeasurements
@@ -172,6 +187,17 @@ update msg model =
 
                         _ ->
                             Cmd.none
+
+                cmdSponsor =
+                    case (Maybe.map .sponsorId selectedSensor) of
+                        Just (Just sponsorId) ->
+                            Api.loadSponsor model.apiToken sponsorId
+
+                        _ ->
+                            Cmd.none
+
+                cmd =
+                    Cmd.batch [ cmdMeasurements, cmdSponsor ]
             in
                 ( { model | selectedSensor = selectedSensor }, cmd )
 
