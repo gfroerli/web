@@ -3,6 +3,7 @@ module Models exposing (..)
 import Date exposing (Date)
 import Map
 import Time
+import Dict exposing (Dict)
 
 
 type alias Model =
@@ -10,6 +11,7 @@ type alias Model =
     , map : Map.Model
     , sensors : List Sensor
     , selectedSensor : Maybe Sensor
+    , sponsors : Dict Int Sponsor
     , apiToken : String
     , now : Maybe Time.Time
     }
@@ -32,6 +34,13 @@ type alias Sensor =
     , updatedAt : Date
     , lastMeasurement : Maybe Measurement
     , historicMeasurements : Maybe (List Measurement)
+    }
+
+
+type alias Sponsor =
+    { name : String
+    , description : String
+    , active : Bool
     }
 
 

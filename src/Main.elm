@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Api
 import Date exposing (toTime)
+import Dict
 import Html.Styled exposing (toUnstyled)
 import List.Extra exposing (find)
 import Map
@@ -49,6 +50,7 @@ init flags location =
           , map = map
           , sensors = []
           , selectedSensor = Nothing
+          , sponsors = Dict.empty
           , apiToken = flags.apiToken
           , now = Nothing
           }
