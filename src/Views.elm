@@ -4,12 +4,13 @@ import Charts exposing (temperatureChart)
 import Css exposing (..)
 import Css.Foreign as Foreign
 import Css.Reset
+import Dict
 import Helpers exposing (formatTemperature)
 import Html.Styled exposing (Html, fromUnstyled)
 import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong, footer)
 import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
 import Messages exposing (..)
-import Models exposing (Model, Sensor, Route(..))
+import Models exposing (Model, Sensor, Sponsor, Route(..))
 import Routing
 import Time exposing (Time)
 
@@ -218,12 +219,24 @@ sidebarContents model =
         [ text <| Maybe.withDefault "Details" (Maybe.map .deviceName model.selectedSensor) ]
     , Maybe.withDefault
         (p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ])
-        (Maybe.map (\s -> sensorDescription model.now s) model.selectedSensor)
+        (Maybe.map
+            (\sensor ->
+                sensorDescription model.now
+                    sensor
+                    (Maybe.andThen
+                        (\sponsorId -> Dict.get sponsorId model.sponsors)
+                        sensor.sponsorId
+                    )
+            )
+            model.selectedSensor
+        )
+
+    --(Maybe.map (\s -> sensorDescription model.now s) model.selectedSensor)
     ]
 
 
-sensorDescription : Maybe Time -> Sensor -> Html Msg
-sensorDescription now sensor =
+sensorDescription : Maybe Time -> Sensor -> Maybe Sponsor -> Html Msg
+sensorDescription now sensor sponsor =
     div []
         [ Maybe.withDefault
             -- Fallback if there is no caption
@@ -278,6 +291,25 @@ sensorDescription now sensor =
                             fromUnstyled <| temperatureChart now mm
                 )
                 sensor.historicMeasurements
+            )
+        , h3 [] [ text "Sponsor" ]
+        , Maybe.withDefault
+            (p
+                [ css [ fontStyle italic ] ]
+                [ text "Sponsor wird geladen..." ]
+            )
+            (Maybe.map
+                (\sponsor ->
+                    div []
+                        [ p
+                            [ css [ fontStyle italic ] ]
+                            [ text sponsor.name ]
+                        , p
+                            []
+                            [ text sponsor.description ]
+                        ]
+                )
+                sponsor
             )
         ]
 
