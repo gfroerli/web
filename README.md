@@ -54,6 +54,12 @@ injected into a HTML page in `src/index.html`. The non-Elm scripting is done in
 Contributions are welcome. If you need any guidance, feel free to create an
 issue on Github or join our IRC channel #coredump on Freenode!
 
+## License
+
+Copyright © 2017–2018 Coredump Hackerspace.
+
+Licensed under the AGPLv3 or later, see `LICENSE.md`.
+
 
 <!-- Badges -->
 [circle-ci]: https://circleci.com/gh/coredump-ch/water-sensor-web/tree/master
