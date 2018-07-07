@@ -99,11 +99,16 @@ toJsMeasurement measurement =
 -- API REQUESTS
 
 
+getUrl : String -> String
+getUrl path =
+    "https://watertemp-api.coredump.ch/api/" ++ path
+
+
 loadSensors : String -> Cmd Msg
 loadSensors apiToken =
     let
         url =
-            "https://watertemp-api.coredump.ch/api/sensors"
+            getUrl "sensors"
 
         request =
             Http.request
@@ -126,8 +131,8 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
             Date.fromTime <| now - ((toFloat secondsAgo) * Time.second)
 
         url =
-            "https://watertemp-api.coredump.ch/api/measurements?sensor_id="
-                ++ (toString sensorId)
+            getUrl "measurements?sensor_id="
+                ++ toString sensorId
                 ++ "&created_after="
                 ++ (Date.Format.formatISO8601 createdAfter)
 
@@ -149,8 +154,7 @@ loadSponsor : String -> Int -> Cmd Msg
 loadSponsor apiToken sponsorId =
     let
         url =
-            "https://watertemp-api.coredump.ch/api/sponsors/"
-                ++ (toString sponsorId)
+            getUrl "sponsors/" ++ toString sponsorId
 
         request =
             Http.request
