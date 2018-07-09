@@ -99,6 +99,11 @@ toJsMeasurement measurement =
 -- API REQUESTS
 
 
+apiTimeout : Time.Time
+apiTimeout =
+    (30 * Time.second)
+
+
 getUrl : String -> String
 getUrl path =
     "https://watertemp-api.coredump.ch/api/" ++ path
@@ -117,7 +122,7 @@ loadSensors apiToken =
                 , url = url
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list sensorDecoder)
-                , timeout = Just (30 * Time.second)
+                , timeout = Just apiTimeout
                 , withCredentials = False
                 }
     in
@@ -143,7 +148,7 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
                 , url = url
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list measurementDecoder)
-                , timeout = Just (30 * Time.second)
+                , timeout = Just apiTimeout
                 , withCredentials = False
                 }
     in
@@ -163,7 +168,7 @@ loadSponsor apiToken sponsorId =
                 , url = url
                 , body = Http.emptyBody
                 , expect = Http.expectJson sponsorDecoder
-                , timeout = Just (30 * Time.second)
+                , timeout = Just apiTimeout
                 , withCredentials = False
                 }
     in
