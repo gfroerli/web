@@ -14,4 +14,5 @@ type Msg
     | SensorsLoaded (Result Http.Error (List Models.Sensor))
     | SensorClicked (Maybe Models.JsSensor)
     | MeasurementsLoaded ( Int, Result Http.Error (List Models.Measurement) )
+    | SponsorLoaded ( Int, Result Http.Error Models.Sponsor )
     | TimeUpdate Time.Time

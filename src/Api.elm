@@ -8,7 +8,7 @@ import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
 import Map
 import Messages exposing (..)
-import Models exposing (Sensor, JsSensor, Measurement, JsMeasurement)
+import Models exposing (Sensor, Sponsor, JsSensor, Measurement, JsMeasurement)
 import Time
 
 
@@ -37,6 +37,14 @@ sensorDecoder =
         |> Pipeline.required "updated_at" DecodeExtra.date
         |> Pipeline.optional "last_measurement" (Decode.nullable measurementDecoder) Nothing
         |> Pipeline.hardcoded Nothing
+
+
+sponsorDecoder : Decode.Decoder Sponsor
+sponsorDecoder =
+    Pipeline.decode Sponsor
+        |> Pipeline.required "name" Decode.string
+        |> Pipeline.optional "description" Decode.string ""
+        |> Pipeline.optional "active" Decode.bool False
 
 
 {-| Parse a string as float. Fail if parsing does not succeed.
@@ -91,11 +99,21 @@ toJsMeasurement measurement =
 -- API REQUESTS
 
 
+apiTimeout : Time.Time
+apiTimeout =
+    (30 * Time.second)
+
+
+getUrl : String -> String
+getUrl path =
+    "https://watertemp-api.coredump.ch/api/" ++ path
+
+
 loadSensors : String -> Cmd Msg
 loadSensors apiToken =
     let
         url =
-            "https://watertemp-api.coredump.ch/api/sensors"
+            getUrl "sensors"
 
         request =
             Http.request
@@ -104,7 +122,7 @@ loadSensors apiToken =
                 , url = url
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list sensorDecoder)
-                , timeout = Just (30 * Time.second)
+                , timeout = Just apiTimeout
                 , withCredentials = False
                 }
     in
@@ -118,8 +136,8 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
             Date.fromTime <| now - ((toFloat secondsAgo) * Time.second)
 
         url =
-            "https://watertemp-api.coredump.ch/api/measurements?sensor_id="
-                ++ (toString sensorId)
+            getUrl "measurements?sensor_id="
+                ++ toString sensorId
                 ++ "&created_after="
                 ++ (Date.Format.formatISO8601 createdAfter)
 
@@ -130,8 +148,28 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
                 , url = url
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list measurementDecoder)
-                , timeout = Just (30 * Time.second)
+                , timeout = Just apiTimeout
                 , withCredentials = False
                 }
     in
         Http.send (\res -> (MeasurementsLoaded ( sensorId, res ))) request
+
+
+loadSponsor : String -> Int -> Cmd Msg
+loadSponsor apiToken sponsorId =
+    let
+        url =
+            getUrl "sponsors/" ++ toString sponsorId
+
+        request =
+            Http.request
+                { method = "GET"
+                , headers = getHeaders apiToken
+                , url = url
+                , body = Http.emptyBody
+                , expect = Http.expectJson sponsorDecoder
+                , timeout = Just apiTimeout
+                , withCredentials = False
+                }
+    in
+        Http.send (\res -> (SponsorLoaded ( sponsorId, res ))) request
