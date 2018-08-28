@@ -5,7 +5,7 @@ import Css exposing (..)
 import Css.Foreign as Foreign
 import Css.Reset
 import Dict
-import Helpers exposing (formatTemperature)
+import Helpers exposing (formatTemperature, linkify)
 import Html.Styled exposing (Html, fromUnstyled)
 import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong, footer)
 import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
@@ -306,7 +306,7 @@ sensorDescription now sensor sponsor =
                             [ text sponsor.name ]
                         , p
                             []
-                            [ text sponsor.description ]
+                            [ linkify sponsor.description ]
                         ]
                 )
                 sponsor
