@@ -1,4 +1,7 @@
-module Helpers exposing (formatTemperature)
+module Helpers exposing (formatTemperature, linkify)
+
+import Html.Styled exposing (Html, text, a, div)
+import Html.Styled.Attributes exposing (href)
 
 
 primitiveRound : String -> Int -> Maybe String
@@ -28,3 +31,21 @@ formatTemperature temp =
 
         Nothing ->
             "invalid"
+
+
+linkify : String -> Html msg
+linkify string =
+    div [] (List.map linkifyWord (String.words string))
+
+
+linkifyWord : String -> Html msg
+linkifyWord word =
+    if isUrl word then
+        a [href word] [text word]
+    else
+        text (word ++ " ")
+
+
+isUrl : String -> Bool
+isUrl =
+    flip String.startsWith >> (flip List.any) [ "http://", "https://" ]
