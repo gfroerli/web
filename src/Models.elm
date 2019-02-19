@@ -18,7 +18,7 @@ type alias Model =
 
 
 type Route
-    = MapRoute
+    = MapRoute (Maybe Int)
     | AboutRoute
     | NotFoundRoute
 

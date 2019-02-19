@@ -80,7 +80,7 @@ update msg model =
                 -- Determine any side effects (e.g. map init) caused by the location change
                 cmd =
                     case newRoute of
-                        MapRoute ->
+                        MapRoute sensorId ->
                             -- Re-initialize map
                             MapPort.initializeMap model.map
 

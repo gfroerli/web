@@ -9,13 +9,14 @@ module Routing
 
 import Models exposing (Route(..))
 import Navigation exposing (Location)
-import UrlParser exposing (Parser, oneOf, parseHash, map, top, s)
+import UrlParser exposing (Parser, oneOf, parseHash, map, top, s, (</>), int)
 
 
 matchers : Parser (Route -> a) a
 matchers =
     oneOf
         [ map MapRoute top
+        , map SensorRoute (s "sensor" </> int)
         , map AboutRoute (s "about")
         ]
 
@@ -33,6 +34,11 @@ parseLocation location =
 mapPath : String
 mapPath =
     "#/"
+
+
+sensorPath : Int -> String
+sensorPath sensorId =
+    "#/sensors/" ++ (toString sensorId)
 
 
 aboutPath : String

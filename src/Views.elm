@@ -23,7 +23,7 @@ Decide which view to render based on the current route.
 view : Model -> Html Msg
 view model =
     case model.route of
-        MapRoute ->
+        MapRoute sensorId ->
             mapView model
 
         AboutRoute ->
