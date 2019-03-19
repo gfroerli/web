@@ -1,13 +1,14 @@
-'use strict';
-
 require('./index.html');
 
-const Elm = require('./Main.elm');
-const elmDiv = document.getElementById('main');
-const elmFlags = {
-    apiToken: process.env.API_TOKEN,
-};
-const elmApp = Elm.Main.embed(elmDiv, elmFlags);
+const entrypoint = require('../elm/Main.elm');
+window.entrypoint = entrypoint;
+
+const elmApp = entrypoint.Elm.Main.init({
+    node: document.getElementById('main'),
+    flags: {
+        apiToken: process.env.API_TOKEN,
+    },
+});
 
 elmApp.ports.initializeMap.subscribe((pos) => {
     console.info('Map: Initialize');
@@ -69,11 +70,13 @@ elmApp.ports.initializeMap.subscribe((pos) => {
     map.addControl(geo, 'top-right');
 
     // Listen for map move events from Elm
+    /*
     elmApp.ports.moveMap.subscribe(newPos => {
         console.debug('Map: New coordinates received:', newPos);
         map.setCenter([newPos.lng, newPos.lat]);
         map.setZoom(newPos.zoom)
     });
+    */
 
     // When new sensors are loaded, display them
     elmApp.ports.sensorsLoaded.subscribe(sensors => {
@@ -148,5 +151,3 @@ elmApp.ports.initializeMap.subscribe((pos) => {
     // Notify Elm that the map has been initialized
     elmApp.ports.mapInitialized.send(null);
 });
-
-window.foo = elmApp;

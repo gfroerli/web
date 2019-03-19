@@ -1,22 +1,17 @@
 {
-    "name": "water-sensor-web",
+    "name": "gfroerli-web",
     "main": "./src/index.js",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "private": true,
-    "scripts": {
-        "build": "webpack",
-        "watch": "webpack --watch",
-        "test": "elm test",
-        "dev": "webpack-dev-server --port 8000"
-    },
     "devDependencies": {
-        "copy-webpack-plugin": "^4.5.1",
-        "dotenv": "^4.0.0",
-        "elm-test": "^0.18.12",
-        "elm-webpack-loader": "^4.5.0",
-        "file-loader": "^1.1.11",
-        "style-loader": "^0.13.1",
-        "webpack": "^3.11.0",
-        "webpack-dev-server": "^2.11.2"
+        "copy-webpack-plugin": "^5",
+        "dotenv": "^7.0.0",
+        "elm-webpack-loader": "^5",
+        "file-loader": "^3",
+        "style-loader": "^0.23",
+        "webpack": "^4",
+        "webpack-cli": "^3.2.3",
+        "webpack-dev-server": "^3",
+        "webpack-merge": "^4.2.1"
     }
 }

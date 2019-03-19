@@ -1,16 +1,20 @@
-port module MapPort exposing (..)
+port module MapPort exposing
+    ( initializeMap
+    , mapInitialized
+    , mapMoved
+    , sensorClicked
+    , sensorsLoaded
+    )
 
 import Map
 import Models
+
 
 
 -- Outgoing Port
 
 
 port initializeMap : Map.Model -> Cmd msg
-
-
-port moveMap : Map.Model -> Cmd msg
 
 
 port sensorsLoaded : List Models.JsSensor -> Cmd msg

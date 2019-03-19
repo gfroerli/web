@@ -12,9 +12,7 @@ dotenv.config();
 // Webpack config
 module.exports = {
     entry: {
-        app: [
-            './src/index.js',
-        ]
+        app: ['./src/static/index.js']
     },
 
     output: {

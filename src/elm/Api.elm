@@ -1,15 +1,15 @@
-module Api exposing (..)
+module Api exposing (apiTimeout, floatAsStringDecoder, getHeaders, getUrl, loadSensorMeasurements, loadSensors, loadSponsor, measurementDecoder, sensorDecoder, sponsorDecoder, toJsMeasurement, toJsSensor)
 
-import Date
-import Date.Format
 import Http
+import Iso8601
 import Json.Decode as Decode
 import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
 import Map
 import Messages exposing (..)
-import Models exposing (Sensor, Sponsor, JsSensor, Measurement, JsMeasurement)
-import Time
+import Models exposing (JsMeasurement, JsSensor, Measurement, Sensor, Sponsor)
+import Time exposing (Posix, millisToPosix, posixToMillis)
+
 
 
 -- AUTHENTICATION
@@ -26,22 +26,22 @@ getHeaders apiToken =
 
 sensorDecoder : Decode.Decoder Sensor
 sensorDecoder =
-    Pipeline.decode Sensor
+    Decode.succeed Sensor
         |> Pipeline.required "id" Decode.int
         |> Pipeline.required "device_name" Decode.string
         |> Pipeline.required "caption" (Decode.nullable Decode.string)
         |> Pipeline.required "latitude" Decode.float
         |> Pipeline.required "longitude" Decode.float
         |> Pipeline.required "sponsor_id" (Decode.nullable Decode.int)
-        |> Pipeline.required "created_at" DecodeExtra.date
-        |> Pipeline.required "updated_at" DecodeExtra.date
+        |> Pipeline.required "created_at" DecodeExtra.datetime
+        |> Pipeline.required "updated_at" DecodeExtra.datetime
         |> Pipeline.optional "last_measurement" (Decode.nullable measurementDecoder) Nothing
         |> Pipeline.hardcoded Nothing
 
 
 sponsorDecoder : Decode.Decoder Sponsor
 sponsorDecoder =
-    Pipeline.decode Sponsor
+    Decode.succeed Sponsor
         |> Pipeline.required "name" Decode.string
         |> Pipeline.optional "description" Decode.string ""
         |> Pipeline.optional "active" Decode.bool False
@@ -54,22 +54,22 @@ floatAsStringDecoder =
     Decode.string
         |> Decode.andThen
             (\str ->
-                case (String.toFloat str) of
-                    Ok parsed ->
+                case String.toFloat str of
+                    Just parsed ->
                         Decode.succeed parsed
 
-                    Err e ->
+                    Nothing ->
                         Decode.fail "Could not parse string value as float"
             )
 
 
 measurementDecoder : Decode.Decoder Measurement
 measurementDecoder =
-    Pipeline.decode Measurement
+    Decode.succeed Measurement
         |> Pipeline.required "id" Decode.int
         |> Pipeline.required "sensor_id" (Decode.nullable Decode.int)
         |> Pipeline.required "temperature" floatAsStringDecoder
-        |> Pipeline.required "created_at" DecodeExtra.date
+        |> Pipeline.required "created_at" DecodeExtra.datetime
 
 
 
@@ -99,9 +99,9 @@ toJsMeasurement measurement =
 -- API REQUESTS
 
 
-apiTimeout : Time.Time
+apiTimeout : Float
 apiTimeout =
-    (30 * Time.second)
+    30 * 1000
 
 
 getUrl : String -> String
@@ -126,20 +126,20 @@ loadSensors apiToken =
                 , withCredentials = False
                 }
     in
-        Http.send SensorsLoaded request
+    Http.send SensorsLoaded request
 
 
-loadSensorMeasurements : String -> Time.Time -> Int -> Int -> Cmd Msg
+loadSensorMeasurements : String -> Posix -> Int -> Int -> Cmd Msg
 loadSensorMeasurements apiToken now sensorId secondsAgo =
     let
         createdAfter =
-            Date.fromTime <| now - ((toFloat secondsAgo) * Time.second)
+            millisToPosix <| posixToMillis now - secondsAgo * 1000
 
         url =
             getUrl "measurements?sensor_id="
-                ++ toString sensorId
+                ++ String.fromInt sensorId
                 ++ "&created_after="
-                ++ (Date.Format.formatISO8601 createdAfter)
+                ++ Iso8601.fromTime createdAfter
 
         request =
             Http.request
@@ -152,14 +152,14 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
                 , withCredentials = False
                 }
     in
-        Http.send (\res -> (MeasurementsLoaded ( sensorId, res ))) request
+    Http.send (\res -> MeasurementsLoaded ( sensorId, res )) request
 
 
 loadSponsor : String -> Int -> Cmd Msg
 loadSponsor apiToken sponsorId =
     let
         url =
-            getUrl "sponsors/" ++ toString sponsorId
+            getUrl "sponsors/" ++ String.fromInt sponsorId
 
         request =
             Http.request
@@ -172,4 +172,4 @@ loadSponsor apiToken sponsorId =
                 , withCredentials = False
                 }
     in
-        Http.send (\res -> (SponsorLoaded ( sponsorId, res ))) request
+    Http.send (\res -> SponsorLoaded ( sponsorId, res )) request
