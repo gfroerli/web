@@ -55,6 +55,7 @@ init flags url key =
       , sponsors = Dict.empty
       , apiToken = flags.apiToken
       , now = Nothing
+      , alerts = []
       }
     , Cmd.batch
         [ MapPort.initializeMap map
@@ -109,12 +110,11 @@ update msg model =
             )
 
         SensorsLoaded (Err error) ->
-            --let
-            --    _ =
-            --        -- TODO
-            --        Debug.log "Error while fetching data" error
-            --in
-            ( model, Cmd.none )
+            let
+                alertMsg =
+                    "Sensoren konnten nicht geladen werden: " ++ Api.errorToString error
+            in
+            ( Models.addErrorAlert model alertMsg, Cmd.none )
 
         SponsorLoaded ( sponsorId, Ok sponsor ) ->
             let
@@ -124,12 +124,14 @@ update msg model =
             ( { model | sponsors = updatedSponsors }, Cmd.none )
 
         SponsorLoaded ( sponsorId, Err error ) ->
-            --let
-            --    _ =
-            --        -- TODO
-            --        Debug.log "Error while fetching sponsor" error
-            --in
-            ( model, Cmd.none )
+            let
+                alertMsg =
+                    "Sponsor-Daten für Sponsor "
+                        ++ String.fromInt sponsorId
+                        ++ " konnten nicht geladen werden: "
+                        ++ Api.errorToString error
+            in
+            ( Models.addErrorAlert model alertMsg, Cmd.none )
 
         MeasurementsLoaded ( sensorId, Ok measurements ) ->
             let
@@ -156,12 +158,14 @@ update msg model =
             ( updatedModel, Cmd.none )
 
         MeasurementsLoaded ( sensorId, Err error ) ->
-            --let
-            --    _ =
-            --        -- TODO
-            --        Debug.log ("Error while fetching measurements for sensor " ++ String.fromInt sensorId) error
-            --in
-            ( model, Cmd.none )
+            let
+                alertMsg =
+                    "Messungen für Sensor "
+                        ++ String.fromInt sensorId
+                        ++ " konnten nicht geladen werden: "
+                        ++ Api.errorToString error
+            in
+            ( Models.addErrorAlert model alertMsg, Cmd.none )
 
         MapDragged pos ->
             let
