@@ -56,7 +56,7 @@ issue on Github or join our IRC channel #coredump on Freenode!
 
 ## License
 
-Copyright © 2017–2018 Coredump Hackerspace.
+Copyright © 2017–2019 Coredump Hackerspace.
 
 Licensed under the AGPLv3 or later, see `LICENSE.md`.
 
