@@ -1,18 +1,20 @@
-module Messages exposing (..)
+module Messages exposing (Msg(..))
 
+import Browser
 import Http
 import Map
 import Models
-import Navigation exposing (Location)
 import Time
+import Url
 
 
 type Msg
-    = LocationChange Location
-    | MapInitialized ()
+    = MapInitialized ()
     | MapDragged Map.Model
     | SensorsLoaded (Result Http.Error (List Models.Sensor))
     | SensorClicked (Maybe Models.JsSensor)
     | MeasurementsLoaded ( Int, Result Http.Error (List Models.Measurement) )
     | SponsorLoaded ( Int, Result Http.Error Models.Sponsor )
-    | TimeUpdate Time.Time
+    | TimeUpdate Time.Posix
+    | LinkClicked Browser.UrlRequest
+    | UrlChanged Url.Url

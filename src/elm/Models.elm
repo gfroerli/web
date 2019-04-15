@@ -1,26 +1,22 @@
-module Models exposing (..)
+module Models exposing (JsMeasurement, JsSensor, Measurement, Model, Sensor, Sponsor)
 
-import Date exposing (Date)
-import Map
-import Time
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
+import Map
+import Routing exposing (Route)
+import Time
 
 
 type alias Model =
-    { route : Route
+    { key : Nav.Key
+    , route : Route
     , map : Map.Model
     , sensors : List Sensor
     , selectedSensor : Maybe Sensor
     , sponsors : Dict Int Sponsor
     , apiToken : String
-    , now : Maybe Time.Time
+    , now : Maybe Time.Posix
     }
-
-
-type Route
-    = MapRoute
-    | AboutRoute
-    | NotFoundRoute
 
 
 type alias Sensor =
@@ -30,8 +26,8 @@ type alias Sensor =
     , latitude : Float
     , longitude : Float
     , sponsorId : Maybe Int
-    , createdAt : Date
-    , updatedAt : Date
+    , createdAt : Time.Posix
+    , updatedAt : Time.Posix
     , lastMeasurement : Maybe Measurement
     , historicMeasurements : Maybe (List Measurement)
     }
@@ -57,7 +53,7 @@ type alias Measurement =
     { id : Int
     , sensorId : Maybe Int
     , temperature : Float
-    , createdAt : Date
+    , createdAt : Time.Posix
     }
 
 

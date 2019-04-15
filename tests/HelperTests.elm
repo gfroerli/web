@@ -1,4 +1,4 @@
-module HelperTests exposing (..)
+module HelperTests exposing (suite)
 
 import Expect exposing (Expectation)
 import Helpers exposing (..)

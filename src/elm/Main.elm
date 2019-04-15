@@ -1,30 +1,31 @@
-module Main exposing (..)
+module Main exposing (Flags, init, main, subscriptions, update)
 
 import Api
-import Date exposing (toTime)
+import Browser
+import Browser.Navigation as Nav
 import Dict
-import Html.Styled exposing (toUnstyled)
 import List.Extra exposing (find)
 import Map
 import MapPort
 import Maybe.Extra
 import Messages exposing (..)
-import Models exposing (Model, Route(..))
-import Navigation
-import Navigation exposing (Location)
-import Routing exposing (parseLocation)
+import Models exposing (Model)
+import Routing exposing (toRoute)
 import Task
-import Time
+import Time exposing (posixToMillis)
+import Url
 import Views exposing (view)
 
 
 main : Program Flags Model Msg
 main =
-    Navigation.programWithFlags LocationChange
+    Browser.application
         { init = init
-        , view = view >> toUnstyled
+        , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlRequest = LinkClicked
+        , onUrlChange = UrlChanged
         }
 
 
@@ -37,28 +38,29 @@ type alias Flags =
 -- MODEL
 
 
-init : Flags -> Location -> ( Model, Cmd Msg )
-init flags location =
+init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
     let
         map =
             Map.init
 
         currentRoute =
-            parseLocation location
+            toRoute url
     in
-        ( { route = currentRoute
-          , map = map
-          , sensors = []
-          , selectedSensor = Nothing
-          , sponsors = Dict.empty
-          , apiToken = flags.apiToken
-          , now = Nothing
-          }
-        , Cmd.batch
-            [ MapPort.initializeMap map
-            , Task.perform TimeUpdate Time.now
-            ]
-        )
+    ( { key = key
+      , route = currentRoute
+      , map = map
+      , sensors = []
+      , selectedSensor = Nothing
+      , sponsors = Dict.empty
+      , apiToken = flags.apiToken
+      , now = Nothing
+      }
+    , Cmd.batch
+        [ MapPort.initializeMap map
+        , Task.perform TimeUpdate Time.now
+        ]
+    )
 
 
 
@@ -71,27 +73,32 @@ update msg model =
         TimeUpdate newTime ->
             ( { model | now = Just newTime }, Cmd.none )
 
-        LocationChange location ->
-            let
-                -- Determine the new route by parsing the location
-                newRoute =
-                    parseLocation location
+        LinkClicked urlRequest ->
+            ( model, Cmd.none )
 
-                -- Determine any side effects (e.g. map init) caused by the location change
-                cmd =
-                    case newRoute of
-                        MapRoute ->
-                            -- Re-initialize map
-                            MapPort.initializeMap model.map
+        UrlChanged url ->
+            ( model, Cmd.none )
 
-                        AboutRoute ->
-                            Cmd.none
-
-                        NotFoundRoute ->
-                            Cmd.none
-            in
-                ( { model | route = newRoute }, cmd )
-
+        --        UrlChanged url ->
+        --            let
+        --                -- Determine the new route by parsing the location
+        --                newRoute =
+        --                    parseLocation location
+        --
+        --                -- Determine any side effects (e.g. map init) caused by the location change
+        --                cmd =
+        --                    case newRoute of
+        --                        MapRoute ->
+        --                            -- Re-initialize map
+        --                            MapPort.initializeMap model.map
+        --
+        --                        AboutRoute ->
+        --                            Cmd.none
+        --
+        --                        NotFoundRoute ->
+        --                            Cmd.none
+        --            in
+        --            ( { model | route = newRoute }, cmd )
         MapInitialized _ ->
             ( model, Api.loadSensors model.apiToken )
 
@@ -102,59 +109,59 @@ update msg model =
             )
 
         SensorsLoaded (Err error) ->
-            let
-                _ =
-                    -- TODO
-                    Debug.log "Error while fetching data" error
-            in
-                ( model, Cmd.none )
+            --let
+            --    _ =
+            --        -- TODO
+            --        Debug.log "Error while fetching data" error
+            --in
+            ( model, Cmd.none )
 
         SponsorLoaded ( sponsorId, Ok sponsor ) ->
             let
                 updatedSponsors =
                     Dict.insert sponsorId sponsor model.sponsors
             in
-                ( { model | sponsors = updatedSponsors }, Cmd.none )
+            ( { model | sponsors = updatedSponsors }, Cmd.none )
 
         SponsorLoaded ( sponsorId, Err error ) ->
-            let
-                _ =
-                    -- TODO
-                    Debug.log "Error while fetching sponsor" error
-            in
-                ( model, Cmd.none )
+            --let
+            --    _ =
+            --        -- TODO
+            --        Debug.log "Error while fetching sponsor" error
+            --in
+            ( model, Cmd.none )
 
         MeasurementsLoaded ( sensorId, Ok measurements ) ->
             let
                 -- Get selected sensor if the sensor id in the received
                 -- measurements matches its id.
                 sensor =
-                    Maybe.Extra.filter (\sensor -> sensor.id == sensorId) model.selectedSensor
+                    Maybe.Extra.filter (\s -> s.id == sensorId) model.selectedSensor
 
                 updatedModel =
                     case sensor of
-                        Just sensor ->
+                        Just s ->
                             let
                                 sortedMeasurements =
-                                    List.sortBy (.createdAt >> toTime) measurements
+                                    List.sortBy (.createdAt >> posixToMillis) measurements
 
                                 updatedSensor =
-                                    { sensor | historicMeasurements = Just sortedMeasurements }
+                                    { s | historicMeasurements = Just sortedMeasurements }
                             in
-                                { model | selectedSensor = Just updatedSensor }
+                            { model | selectedSensor = Just updatedSensor }
 
                         Nothing ->
                             model
             in
-                ( updatedModel, Cmd.none )
+            ( updatedModel, Cmd.none )
 
         MeasurementsLoaded ( sensorId, Err error ) ->
-            let
-                _ =
-                    -- TODO
-                    Debug.log ("Error while fetching measurements for sensor " ++ (toString sensorId)) error
-            in
-                ( model, Cmd.none )
+            --let
+            --    _ =
+            --        -- TODO
+            --        Debug.log ("Error while fetching measurements for sensor " ++ String.fromInt sensorId) error
+            --in
+            ( model, Cmd.none )
 
         MapDragged pos ->
             let
@@ -168,7 +175,7 @@ update msg model =
                         , zoom = pos.zoom
                     }
             in
-                ( { model | map = newMap }, Cmd.none )
+            ( { model | map = newMap }, Cmd.none )
 
         SensorClicked (Just jsSensor) ->
             let
@@ -189,7 +196,7 @@ update msg model =
                             Cmd.none
 
                 cmdSponsor =
-                    case (Maybe.map .sponsorId selectedSensor) of
+                    case Maybe.map .sponsorId selectedSensor of
                         Just (Just sponsorId) ->
                             Api.loadSponsor model.apiToken sponsorId
 
@@ -199,7 +206,7 @@ update msg model =
                 cmd =
                     Cmd.batch [ cmdMeasurements, cmdSponsor ]
             in
-                ( { model | selectedSensor = selectedSensor }, cmd )
+            ( { model | selectedSensor = selectedSensor }, cmd )
 
         SensorClicked Nothing ->
             ( { model | selectedSensor = Nothing }, Cmd.none )
@@ -211,5 +218,5 @@ subscriptions model =
         [ MapPort.mapInitialized MapInitialized
         , MapPort.mapMoved MapDragged
         , MapPort.sensorClicked SensorClicked
-        , Time.every (30 * Time.second) TimeUpdate
+        , Time.every (10 * 1000) TimeUpdate
         ]

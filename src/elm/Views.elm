@@ -1,18 +1,17 @@
 module Views exposing (view)
 
+import Browser
 import Charts exposing (temperatureChart)
 import Css exposing (..)
-import Css.Foreign as Foreign
-import Css.Reset
+import Css.Global as Global
 import Dict
 import Helpers exposing (formatTemperature)
-import Html.Styled exposing (Html, fromUnstyled)
-import Html.Styled exposing (h1, h2, h3, h4, h5, h6, div, p, text, a, img, strong, footer)
-import Html.Styled.Attributes as Attr exposing (id, class, css, src, href)
+import Html.Styled exposing (Html, a, div, footer, fromUnstyled, h1, h2, h3, h4, h5, h6, img, p, strong, text, toUnstyled)
+import Html.Styled.Attributes as Attr exposing (class, css, href, id, src)
 import Messages exposing (..)
-import Models exposing (Model, Sensor, Sponsor, Route(..))
-import Routing
-import Time exposing (Time)
+import Models exposing (Model, Sensor, Sponsor)
+import Routing exposing (Route(..))
+import Time
 
 
 {-| Root view.
@@ -20,17 +19,23 @@ import Time exposing (Time)
 Decide which view to render based on the current route.
 
 -}
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    case model.route of
-        MapRoute ->
-            mapView model
+    let
+        body =
+            case model.route of
+                MapRoute ->
+                    mapView model
 
-        AboutRoute ->
-            aboutView
+                AboutRoute ->
+                    aboutView
 
-        NotFoundRoute ->
-            notFoundView
+                NotFoundRoute ->
+                    notFoundView
+    in
+    { title = "Gfrörli – Wassertemperatur Schweiz"
+    , body = [ toUnstyled body ]
+    }
 
 
 {-| Wrap a list of HTML elements in a wrapper div with full height.
@@ -45,17 +50,16 @@ page subtitle elements =
             ]
         ]
         (List.append
-            [ Css.Reset.css
-            , Foreign.global
-                [ Foreign.body <| fontBody ++ [ fontSize (px 16) ]
-                , Foreign.id "main" [ minHeight (vh 100) ]
-                , Foreign.h1 <| fontHeading ++ [ fontSize (em 3.4), marginBottom (px 16) ]
-                , Foreign.h2 <| fontHeading ++ [ fontSize (em 2.2), marginBottom (px 8) ]
-                , Foreign.h3 <| fontHeading ++ [ fontSize (em 1.6), marginBottom (px 8) ]
-                , Foreign.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
-                , Foreign.p [ lineHeight (em 1.5), marginBottom (px 8) ]
-                , Foreign.strong [ fontWeight bold ]
-                , Foreign.class "marker"
+            [ Global.global
+                [ Global.body <| fontBody ++ [ fontSize (px 16) ]
+                , Global.id "main" [ minHeight (vh 100) ]
+                , Global.h1 <| fontHeading ++ [ fontSize (em 3.4), marginBottom (px 16) ]
+                , Global.h2 <| fontHeading ++ [ fontSize (em 2.2), marginBottom (px 8) ]
+                , Global.h3 <| fontHeading ++ [ fontSize (em 1.6), marginBottom (px 8) ]
+                , Global.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
+                , Global.p [ lineHeight (em 1.5), marginBottom (px 8) ]
+                , Global.strong [ fontWeight bold ]
+                , Global.class "marker"
                     [ backgroundImage (url "/static/marker.svg")
                     , backgroundSize cover
                     , width (px 32)
@@ -66,7 +70,7 @@ page subtitle elements =
                     , verticalAlign middle
                     , fontWeight bold
                     , fontSize (px 16)
-                    , Foreign.withClass "selected"
+                    , Global.withClass "selected"
                         [ backgroundImage (url "/static/marker-selected.svg") ]
                     ]
                 ]
@@ -137,6 +141,7 @@ pluralize : String -> String -> Int -> String
 pluralize singular plural quantity =
     if quantity == 1 then
         singular
+
     else
         plural
 
@@ -147,8 +152,8 @@ mapView : Model -> Html Msg
 mapView model =
     page
         ("Finde die aktuelle und historische Wassertemperatur an "
-            ++ (model.sensors |> List.length |> toString)
-            ++ (pluralize " Standort" " Standorten" (model.sensors |> List.length))
+            ++ (model.sensors |> List.length |> String.fromInt)
+            ++ pluralize " Standort" " Standorten" (model.sensors |> List.length)
             ++ " rund um den Zürichsee!"
         )
         [ div [ css [ position absolute, top (px 8), right (px 8) ] ]
@@ -235,7 +240,7 @@ sidebarContents model =
     ]
 
 
-sensorDescription : Maybe Time -> Sensor -> Maybe Sponsor -> Html Msg
+sensorDescription : Maybe Time.Posix -> Sensor -> Maybe Sponsor -> Html Msg
 sensorDescription now sensor sponsor =
     div []
         [ Maybe.withDefault
@@ -247,10 +252,9 @@ sensorDescription now sensor sponsor =
             -- Extract and show caption
             (Maybe.map
                 (\s ->
-                    (p
+                    p
                         [ css [ fontStyle normal ] ]
                         [ text s ]
-                    )
                 )
                 sensor.caption
             )
@@ -264,10 +268,9 @@ sensorDescription now sensor sponsor =
             -- Extract and show last measurement
             (Maybe.map
                 (\measurement ->
-                    (p
+                    p
                         [ css [ fontStyle normal ] ]
-                        [ text (measurement.temperature |> toString |> formatTemperature) ]
-                    )
+                        [ text (measurement.temperature |> String.fromFloat |> formatTemperature) ]
                 )
                 sensor.lastMeasurement
             )
@@ -299,14 +302,14 @@ sensorDescription now sensor sponsor =
                 [ text "Sponsor wird geladen..." ]
             )
             (Maybe.map
-                (\sponsor ->
+                (\sp ->
                     div []
                         [ p
                             [ css [ fontStyle italic ] ]
-                            [ text sponsor.name ]
+                            [ text sp.name ]
                         , p
                             []
-                            [ text sponsor.description ]
+                            [ text sp.description ]
                         ]
                 )
                 sponsor
