@@ -10,7 +10,7 @@ setup:
 	npm install
 
 test:
-	npm test
+	npx elm-test
 
 run:
 	npx webpack-dev-server --port 8000 --config webpack.dev.js

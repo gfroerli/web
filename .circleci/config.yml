@@ -2,12 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: codesimple/elm:0.19
+      - image: node:10
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}-{{ checksum "tests/elm.json" }}
+            - v2-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
       - run:
           name: Install sysconfcpus to fix core count detection
           command: |
@@ -17,11 +17,14 @@ jobs:
             make && make install;
             cd ..;
       - run:
-          name: Install npm dependencies
-          command: npm install
+          name: Install elm
+          command: >
+            mkdir ~/.npm-global
+            && npm config set prefix '~/.npm-global'
+            && npm install --unsafe-perm -g elm@0.19.0-bugfix6
       - run:
-          name: Install elm dependencies
-          command: sysconfcpus -n 2 elm make --yes
+          name: Install dependencies
+          command: sysconfcpus -n 2 make setup
       - run:
           name: Build project
           command: sysconfcpus -n 2 make dist
@@ -29,8 +32,7 @@ jobs:
           name: Test project
           command: sysconfcpus -n 2 make test
       - save_cache:
-          key:  v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}-{{ checksum "tests/elm.json" }}
+          key:  v2-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
           paths:
             - elm-stuff
-            - tests/elm-stuff
             - node_modules
