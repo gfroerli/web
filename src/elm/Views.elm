@@ -6,10 +6,10 @@ import Css exposing (..)
 import Css.Global as Global
 import Dict
 import Helpers exposing (formatTemperature)
-import Html.Styled exposing (Html, a, div, footer, fromUnstyled, h1, h2, h3, h4, h5, h6, img, p, strong, text, toUnstyled)
+import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, h4, h5, h6, img, p, span, strong, text, toUnstyled)
 import Html.Styled.Attributes as Attr exposing (class, css, href, id, src)
 import Messages exposing (..)
-import Models exposing (Model, Sensor, Sponsor)
+import Models exposing (Alert, Model, Sensor, Severity(..), Sponsor)
 import Routing exposing (Route(..))
 import Time
 
@@ -40,8 +40,8 @@ view model =
 
 {-| Wrap a list of HTML elements in a wrapper div with full height.
 -}
-page : String -> List (Html Msg) -> Html Msg
-page subtitle elements =
+page : String -> List Alert -> List (Html Msg) -> Html Msg
+page subtitle alerts elements =
     div
         [ css
             [ minHeight (vh 100)
@@ -80,8 +80,38 @@ page subtitle elements =
                 ]
             , p [ css [ textAlign center, margin2 (px 16) zero ] ]
                 [ text subtitle ]
+            , alertMessages alerts
             ]
             elements
+        )
+
+
+styleMessage : Alert -> List (Attribute Msg)
+styleMessage alert =
+    case alert.severity of
+        Error ->
+            [ css
+                [ color (hex "#ffffff")
+                , backgroundColor (hex "#c62828")
+                , textAlign center
+                , padding (px 8)
+                ]
+            ]
+
+
+{-| Alert messages shown to the user (e.g. errors)
+-}
+alertMessages : List Alert -> Html Msg
+alertMessages alerts =
+    div [ id "alerts" ]
+        (List.map
+            (\alert ->
+                p (styleMessage alert)
+                    [ span [ css [ fontWeight bold ] ] [ text "Fehler: " ]
+                    , text alert.message
+                    ]
+            )
+            alerts
         )
 
 
@@ -91,6 +121,7 @@ notFoundView : Html Msg
 notFoundView =
     page
         ""
+        []
         [ div [ css [ width (pct 100), textAlign center ] ]
             [ p
                 [ css [ fontSize (em 12) ] ]
@@ -108,6 +139,7 @@ aboutView : Html Msg
 aboutView =
     page
         ""
+        []
         [ div
             [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
             [ h2 [] [ text "About" ]
@@ -156,6 +188,7 @@ mapView model =
             ++ pluralize " Standort" " Standorten" (model.sensors |> List.length)
             ++ " rund um den Zürichsee!"
         )
+        model.alerts
         [ div [ css [ position absolute, top (px 8), right (px 8) ] ]
             [ a
                 [ href "https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh" ]

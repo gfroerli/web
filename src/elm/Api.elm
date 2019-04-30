@@ -1,6 +1,20 @@
-module Api exposing (apiTimeout, floatAsStringDecoder, getHeaders, getUrl, loadSensorMeasurements, loadSensors, loadSponsor, measurementDecoder, sensorDecoder, sponsorDecoder, toJsMeasurement, toJsSensor)
+module Api exposing
+    ( apiTimeout
+    , errorToString
+    , floatAsStringDecoder
+    , getHeaders
+    , getUrl
+    , loadSensorMeasurements
+    , loadSensors
+    , loadSponsor
+    , measurementDecoder
+    , sensorDecoder
+    , sponsorDecoder
+    , toJsMeasurement
+    , toJsSensor
+    )
 
-import Http
+import Http exposing (Error(..))
 import Iso8601
 import Json.Decode as Decode
 import Json.Decode.Extra as DecodeExtra
@@ -114,19 +128,16 @@ loadSensors apiToken =
     let
         url =
             getUrl "sensors"
-
-        request =
-            Http.request
-                { method = "GET"
-                , headers = getHeaders apiToken
-                , url = url
-                , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list sensorDecoder)
-                , timeout = Just apiTimeout
-                , withCredentials = False
-                }
     in
-    Http.send SensorsLoaded request
+    Http.request
+        { method = "GET"
+        , headers = getHeaders apiToken
+        , url = url
+        , body = Http.emptyBody
+        , expect = Http.expectJson SensorsLoaded (Decode.list sensorDecoder)
+        , timeout = Just apiTimeout
+        , tracker = Nothing
+        }
 
 
 loadSensorMeasurements : String -> Posix -> Int -> Int -> Cmd Msg
@@ -141,18 +152,18 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
                 ++ "&created_after="
                 ++ Iso8601.fromTime createdAfter
 
-        request =
-            Http.request
-                { method = "GET"
-                , headers = getHeaders apiToken
-                , url = url
-                , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list measurementDecoder)
-                , timeout = Just apiTimeout
-                , withCredentials = False
-                }
+        handler =
+            \res -> MeasurementsLoaded ( sensorId, res )
     in
-    Http.send (\res -> MeasurementsLoaded ( sensorId, res )) request
+    Http.request
+        { method = "GET"
+        , headers = getHeaders apiToken
+        , url = url
+        , body = Http.emptyBody
+        , expect = Http.expectJson handler (Decode.list measurementDecoder)
+        , timeout = Just apiTimeout
+        , tracker = Nothing
+        }
 
 
 loadSponsor : String -> Int -> Cmd Msg
@@ -161,15 +172,38 @@ loadSponsor apiToken sponsorId =
         url =
             getUrl "sponsors/" ++ String.fromInt sponsorId
 
-        request =
-            Http.request
-                { method = "GET"
-                , headers = getHeaders apiToken
-                , url = url
-                , body = Http.emptyBody
-                , expect = Http.expectJson sponsorDecoder
-                , timeout = Just apiTimeout
-                , withCredentials = False
-                }
+        handler =
+            \res -> SponsorLoaded ( sponsorId, res )
     in
-    Http.send (\res -> SponsorLoaded ( sponsorId, res )) request
+    Http.request
+        { method = "GET"
+        , headers = getHeaders apiToken
+        , url = url
+        , body = Http.emptyBody
+        , expect = Http.expectJson handler sponsorDecoder
+        , timeout = Just apiTimeout
+        , tracker = Nothing
+        }
+
+
+
+-- ERROR HANDLING
+
+
+errorToString : Http.Error -> String
+errorToString error =
+    case error of
+        BadUrl _ ->
+            "BadUrl"
+
+        Timeout ->
+            "Server antwortet nicht"
+
+        NetworkError ->
+            "Netzwerk-Fehler"
+
+        BadStatus code ->
+            "HTTP " ++ String.fromInt code
+
+        BadBody _ ->
+            "Fehlerhafte Server-Antwort"

@@ -1,10 +1,43 @@
-module Models exposing (JsMeasurement, JsSensor, Measurement, Model, Sensor, Sponsor)
+module Models exposing
+    ( Alert
+    , JsMeasurement
+    , JsSensor
+    , Measurement
+    , Model
+    , Sensor
+    , Severity(..)
+    , Sponsor
+    , addErrorAlert
+    )
 
 import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import Map
 import Routing exposing (Route)
 import Time
+
+
+type Severity
+    = Error
+
+
+type alias Alert =
+    { severity : Severity
+    , message : String
+    }
+
+
+{-| Add an error alert message to the model.
+-}
+addErrorAlert : Model -> String -> Model
+addErrorAlert model msg =
+    let
+        alert =
+            { severity = Error
+            , message = msg
+            }
+    in
+    { model | alerts = alert :: model.alerts }
 
 
 type alias Model =
@@ -16,6 +49,7 @@ type alias Model =
     , sponsors : Dict Int Sponsor
     , apiToken : String
     , now : Maybe Time.Posix
+    , alerts : List Alert
     }
 
 
