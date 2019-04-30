@@ -13,8 +13,11 @@ const elmApp = entrypoint.Elm.Main.init({
 elmApp.ports.initializeMap.subscribe((pos) => {
     console.info('Map: Initialize');
 
-    // TODO:
-    // mapboxgl.supported() -> browser support
+    // Check whether WebGL is supported
+    if (!mapboxgl.supported()) {
+        elmApp.ports.mapInitializationFailed.send("Could not initialize map: WebGL not supported");
+        return;
+    }
 
     // Credentials
     mapboxgl.accessToken = 'pk.eyJ1IjoiY29yZWR1bXBjaCIsImEiOiJjamE4bXFhMGcwODd5MnFwY2poa3Rnd2U5In0.O5jacsI2pxe3fIAxQdu0Yg';

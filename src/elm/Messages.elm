@@ -10,6 +10,7 @@ import Url
 
 type Msg
     = MapInitialized ()
+    | MapInitializationFailed String
     | MapDragged Map.Model
     | SensorsLoaded (Result Http.Error (List Models.Sensor))
     | SensorClicked (Maybe Models.JsSensor)

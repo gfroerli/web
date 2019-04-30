@@ -103,6 +103,9 @@ update msg model =
         MapInitialized _ ->
             ( model, Api.loadSensors model.apiToken )
 
+        MapInitializationFailed alertMsg ->
+            ( Models.addErrorAlert model alertMsg, Cmd.none )
+
         SensorsLoaded (Ok sensors) ->
             ( { model | selectedSensor = Nothing, sensors = sensors }
             , List.map Api.toJsSensor sensors
@@ -220,6 +223,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ MapPort.mapInitialized MapInitialized
+        , MapPort.mapInitializationFailed MapInitializationFailed
         , MapPort.mapMoved MapDragged
         , MapPort.sensorClicked SensorClicked
         , Time.every (10 * 1000) TimeUpdate
