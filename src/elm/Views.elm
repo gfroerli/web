@@ -1,4 +1,4 @@
-module Views exposing (view)
+module Views exposing (splitParagraphs, view)
 
 import Browser
 import Charts exposing (temperatureChart)
@@ -372,4 +372,14 @@ fontHeading =
 -}
 splitParagraphs : String -> List (Html msg)
 splitParagraphs str =
-    List.map (\x -> p [] [ text x ]) (String.split "\n" str)
+    let
+        isNotEmpty =
+            not << String.isEmpty
+
+        parts =
+            List.filter isNotEmpty (String.split "\n" str)
+
+        textToParagraph =
+            \t -> p [] [ text t ]
+    in
+    List.map textToParagraph parts
