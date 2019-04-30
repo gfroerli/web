@@ -1,5 +1,6 @@
 port module MapPort exposing
     ( initializeMap
+    , mapInitializationFailed
     , mapInitialized
     , mapMoved
     , sensorClicked
@@ -25,6 +26,9 @@ port sensorsLoaded : List Models.JsSensor -> Cmd msg
 
 
 port mapInitialized : (() -> msg) -> Sub msg
+
+
+port mapInitializationFailed : (String -> msg) -> Sub msg
 
 
 port mapMoved : (Map.Model -> msg) -> Sub msg
