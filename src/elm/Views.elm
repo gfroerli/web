@@ -44,7 +44,7 @@ page : String -> List Alert -> List (Html Msg) -> Html Msg
 page subtitle alerts elements =
     div
         [ css
-            [ minHeight (vh 100)
+            [ height (vh 100)
             , displayFlex
             , flexDirection column
             ]
@@ -203,6 +203,7 @@ mapView model =
                 , displayFlex
                 , flexDirection row
                 , alignItems stretch
+                , overflow hidden
                 ]
             ]
             [ div
@@ -230,6 +231,7 @@ mapView model =
                     [ flexBasis (pct 20)
                     , padding (px 16)
                     , backgroundColor (hex "#F7F7F7")
+                    , overflowY auto
                     ]
                 ]
                 (sidebarContents model)
