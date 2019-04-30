@@ -338,14 +338,12 @@ sensorDescription now sensor sponsor =
             )
             (Maybe.map
                 (\sp ->
-                    div []
+                    div [] <|
                         [ p
                             [ css [ fontStyle italic ] ]
                             [ text sp.name ]
-                        , p
-                            []
-                            [ text sp.description ]
                         ]
+                            ++ splitParagraphs sp.description
                 )
                 sponsor
             )
@@ -368,3 +366,10 @@ fontHeading =
     [ fontFamilies [ "Barlow Semi Condensed", .value sansSerif ]
     , color (rgb 50 50 50)
     ]
+
+
+{-| Split text at newline characters, create paragraphs
+-}
+splitParagraphs : String -> List (Html msg)
+splitParagraphs str =
+    List.map (\x -> p [] [ text x ]) (String.split "\n" str)
