@@ -10,7 +10,7 @@ const elmApp = entrypoint.Elm.Main.init({
     },
 });
 
-elmApp.ports.initializeMap.subscribe((pos) => {
+const initializeMap = (pos) => {
     console.info('Map: Initialize');
 
     // Check whether WebGL is supported
@@ -153,4 +153,8 @@ elmApp.ports.initializeMap.subscribe((pos) => {
 
     // Notify Elm that the map has been initialized
     elmApp.ports.mapInitialized.send(null);
+};
+
+elmApp.ports.initializeMap.subscribe((pos) => {
+    window.requestAnimationFrame(() => initializeMap(pos));
 });
