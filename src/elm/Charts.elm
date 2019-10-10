@@ -1,115 +1,87 @@
 module Charts exposing (temperatureChart)
 
-import Html exposing (Html, p, text)
-import LineChart exposing (Config)
-import LineChart.Area as Area
-import LineChart.Axis as Axis
-import LineChart.Axis.Intersection as Intersection
-import LineChart.Axis.Line as AxisLine
-import LineChart.Axis.Range as Range
-import LineChart.Axis.Ticks as Ticks
-import LineChart.Axis.Title as Title
-import LineChart.Colors as Colors
-import LineChart.Container as Container
-import LineChart.Dots as Dots
-import LineChart.Events as Events
-import LineChart.Grid as Grid
-import LineChart.Interpolation as Interpolation
-import LineChart.Junk as Junk
-import LineChart.Legends as Legends
-import LineChart.Line as Line
+import Axis
+import Html exposing (Html, div, text)
 import Models exposing (Measurement)
-import Time exposing (Posix, posixToMillis, utc)
+import Scale exposing (ContinuousScale)
+import Time exposing (Posix)
+import TypedSvg exposing (g, svg)
+import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
+import TypedSvg.Core exposing (Svg)
+import TypedSvg.Types exposing (Transform(..))
 
 
-type alias Point =
-    { x : Float, y : Float }
+w : Float
+w =
+    400
 
 
-chartConfig : Range.Config -> Int -> Config Measurement msg
-chartConfig range tickCount =
+h : Float
+h =
+    240
+
+
+padding : Float
+padding =
+    30
+
+
+{-| The X scale.
+
+It starts with the first measurement timestamps and ends with now.
+
+-}
+xScale : Posix -> List Measurement -> ContinuousScale Time.Posix
+xScale now measurements =
     let
-        x_axis : Axis.Config Measurement msg
-        x_axis =
-            Axis.custom
-                { title = Title.default ""
-                , variable = Just << toFloat << posixToMillis << .createdAt
-                , pixels = 500
-                , range = range
-                , axisLine = AxisLine.none
-                , ticks = Ticks.time utc tickCount
-                }
+        firstMeasurementTime =
+            List.head measurements |> Maybe.map .createdAt
 
-        y_axis : Axis.Config Measurement msg
-        y_axis =
-            Axis.custom
-                { title = Title.default ""
-                , variable = Just << .temperature
-                , pixels = 300
-                , range = Range.padded 20 20
-                , axisLine =
-                    AxisLine.custom <|
-                        \dataRange axisRange ->
-                            { color = Colors.grayLight
-                            , width = 3
-                            , events = []
-                            , start = dataRange.min
-                            , end = dataRange.max
-                            }
-                , ticks = Ticks.default
-                }
+        -- If a first measurement is found, use it. Otherwise fall back to the
+        -- current time.
+        min =
+            Maybe.withDefault now firstMeasurementTime
+
+        max =
+            now
     in
-    { y = y_axis
-    , x = x_axis
-    , container =
-        Container.custom
-            { attributesHtml = []
-            , attributesSvg = []
-            , size = Container.relative
-            , margin = Container.Margin 10 10 60 50
-            , id = "line-chart-30d"
-            }
-    , interpolation = Interpolation.default
-    , intersection = Intersection.default
-    , legends = Legends.none
-    , events = Events.default
-    , junk = Junk.default
-    , grid = Grid.lines 0.75 Colors.grayLight
-    , area = Area.default
-    , line = Line.wider 2
-    , dots = Dots.custom (Dots.full 0)
-    }
+    Scale.time Time.utc
+        ( 0, w - 2 * padding )
+        ( min, max )
 
 
-temperatureChart : Maybe Posix -> List Measurement -> Html msg
-temperatureChart now measurements =
+yScale : List Measurement -> ContinuousScale Float
+yScale measurements =
     let
-        -- 1h offset / padding
-        paddingMs =
-            1 * 1000 * 3600
+        temperatures =
+            List.map .temperature measurements
 
-        range =
-            case now of
-                Just n ->
-                    Range.window
-                        ((n |> posixToMillis |> toFloat) - (1000 * 3600 * 24 * 3) - paddingMs)
-                        ((n |> posixToMillis |> toFloat) + paddingMs)
+        min =
+            Maybe.withDefault 0 (List.minimum temperatures)
 
-                Nothing ->
-                    Range.padded 20 20
+        max =
+            Maybe.withDefault 20 (List.maximum temperatures)
+    in
+    Scale.linear
+        ( h - 2 * padding, 0 )
+        ( min, max )
 
+
+xAxis : Posix -> List Measurement -> Svg msg
+xAxis now measurements =
+    let
         -- We want to determine the number of ticks to show on the x axis
         -- depending on the amount of available data.
         -- Scale the number of ticks to ensure that the values are still readable.
         tickCount =
-            case ( now, List.head measurements ) of
-                ( Just n, Just measurement ) ->
+            case List.head measurements of
+                Just measurement ->
                     let
                         nowMillis =
-                            n |> posixToMillis
+                            now |> Time.posixToMillis
 
                         createdMillis =
-                            measurement.createdAt |> posixToMillis
+                            measurement.createdAt |> Time.posixToMillis
 
                         hoursOfData =
                             toFloat (nowMillis - createdMillis) / 1000 / 3600
@@ -132,6 +104,24 @@ temperatureChart now measurements =
                 _ ->
                     0
     in
-    LineChart.viewCustom
-        (chartConfig range tickCount)
-        [ LineChart.line Colors.blue Dots.circle "Temperature" measurements ]
+    Axis.bottom [ Axis.tickCount tickCount ] (xScale now measurements)
+
+
+yAxis : List Measurement -> Svg msg
+yAxis measurements =
+    Axis.left [ Axis.tickCount 5 ] (yScale measurements)
+
+
+temperatureChart : Maybe Posix -> List Measurement -> Html msg
+temperatureChart maybeNow measurements =
+    case maybeNow of
+        Just now ->
+            svg [ viewBox 0 0 w h ]
+                [ g [ transform [ Translate (padding - 1) (h - padding) ] ]
+                    [ xAxis now measurements ]
+                , g [ transform [ Translate (padding - 1) padding ] ]
+                    [ yAxis measurements ]
+                ]
+
+        Nothing ->
+            div [] [ text "Missing time" ]
