@@ -75,31 +75,33 @@ update msg model =
             ( { model | now = Just newTime }, Cmd.none )
 
         LinkClicked urlRequest ->
-            ( model, Cmd.none )
+            case urlRequest of
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
 
         UrlChanged url ->
-            ( model, Cmd.none )
+            let
+                -- Determine the new route by parsing the location
+                newRoute =
+                    toRoute url
 
-        --        UrlChanged url ->
-        --            let
-        --                -- Determine the new route by parsing the location
-        --                newRoute =
-        --                    parseLocation location
-        --
-        --                -- Determine any side effects (e.g. map init) caused by the location change
-        --                cmd =
-        --                    case newRoute of
-        --                        MapRoute ->
-        --                            -- Re-initialize map
-        --                            MapPort.initializeMap model.map
-        --
-        --                        AboutRoute ->
-        --                            Cmd.none
-        --
-        --                        NotFoundRoute ->
-        --                            Cmd.none
-        --            in
-        --            ( { model | route = newRoute }, cmd )
+                -- Determine any side effects (e.g. map init) caused by the location change
+                cmd =
+                    case newRoute of
+                        Routing.MapRoute ->
+                            MapPort.initializeMap model.map
+
+                        Routing.AboutRoute ->
+                            Cmd.none
+
+                        Routing.NotFoundRoute ->
+                            Cmd.none
+            in
+            ( { model | route = newRoute }, cmd )
+
         MapInitialized _ ->
             ( model, Api.loadSensors model.apiToken )
 
