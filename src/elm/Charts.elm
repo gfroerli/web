@@ -1,29 +1,43 @@
 module Charts exposing (temperatureChart)
 
 import Axis
+import Color
 import Html exposing (Html, div, text)
 import Models exposing (Measurement)
+import Path exposing (Path)
 import Scale exposing (ContinuousScale)
+import Shape
 import Time exposing (Posix)
 import TypedSvg exposing (g, svg)
-import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
+import TypedSvg.Attributes exposing (class, fill, stroke, transform, viewBox)
+import TypedSvg.Attributes.InPx exposing (strokeWidth)
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types exposing (Transform(..))
+import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 w : Float
 w =
-    400
+    420
 
 
 h : Float
 h =
-    240
+    220
 
 
 padding : Float
 padding =
     30
+
+
+colorLine : Color.Color
+colorLine =
+    Color.rgba 0.05098 0.27843 0.63137 1.0
+
+
+colorArea : Color.Color
+colorArea =
+    Color.rgba 0.05098 0.27843 0.63137 0.3
 
 
 {-| The X scale.
@@ -112,6 +126,38 @@ yAxis measurements =
     Axis.left [ Axis.tickCount 5 ] (yScale measurements)
 
 
+transformToLineData : Posix -> List Measurement -> Measurement -> Maybe ( Float, Float )
+transformToLineData now measurements measurement =
+    Just
+        ( Scale.convert (xScale now measurements) measurement.createdAt
+        , Scale.convert (yScale measurements) measurement.temperature
+        )
+
+
+transformToAreaData : Posix -> List Measurement -> Measurement -> Maybe ( ( Float, Float ), ( Float, Float ) )
+transformToAreaData now measurements measurement =
+    Just
+        ( ( Scale.convert (xScale now measurements) measurement.createdAt
+          , Tuple.first (Scale.rangeExtent (yScale measurements))
+          )
+        , ( Scale.convert (xScale now measurements) measurement.createdAt
+          , Scale.convert (yScale measurements) measurement.temperature
+          )
+        )
+
+
+line : Posix -> List Measurement -> Path
+line now measurements =
+    List.map (transformToLineData now measurements) measurements
+        |> Shape.line Shape.monotoneInXCurve
+
+
+area : Posix -> List Measurement -> Path
+area now measurements =
+    List.map (transformToAreaData now measurements) measurements
+        |> Shape.area Shape.monotoneInXCurve
+
+
 temperatureChart : Maybe Posix -> List Measurement -> Html msg
 temperatureChart maybeNow measurements =
     case maybeNow of
@@ -121,6 +167,10 @@ temperatureChart maybeNow measurements =
                     [ xAxis now measurements ]
                 , g [ transform [ Translate (padding - 1) padding ] ]
                     [ yAxis measurements ]
+                , g [ transform [ Translate padding padding ], class [ "series" ] ]
+                    [ Path.element (area now measurements) [ strokeWidth 3, fill <| Fill <| colorArea ]
+                    , Path.element (line now measurements) [ stroke colorLine, strokeWidth 3, fill FillNone ]
+                    ]
                 ]
 
         Nothing ->
