@@ -15,6 +15,7 @@ here's [another tutorial](https://www.elm-tutorial.org/).
 
 If you use `nvm`, add an override for the required NodeJS version:
 
+    nvm install
     nvm use
 
 To install all dependencies:
