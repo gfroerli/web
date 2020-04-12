@@ -228,7 +228,7 @@ mapView model =
             , div
                 [ id "sidebar"
                 , css
-                    [ flexBasis (pct 20)
+                    [ flexBasis (pct 30)
                     , padding (px 16)
                     , backgroundColor (hex "#F7F7F7")
                     , overflowY auto
