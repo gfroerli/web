@@ -149,7 +149,7 @@ suite =
                                     """
                                         { "id": 1
                                         , "sensor_id": 3
-                                        , "temperature": "27.3"
+                                        , "temperature": 27.3
                                         , "created_at": "2016-11-29T20:35:21.813Z"
                                         , "updated_at": "2016-11-29T20:36:48.016Z"
                                         }
