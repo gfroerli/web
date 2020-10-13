@@ -7,7 +7,7 @@ Web application for the water sensor API, written in
 
 ## Requirements
 
-You need NodeJS 10 and Elm 0.18: https://guide.elm-lang.org/install.html
+You need NodeJS 10. Elm will be installed through npm.
 
 If you aren't familiar with Elm yet, you should probably read [the
 tutorial](https://guide.elm-lang.org/). When you're done with that,
