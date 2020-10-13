@@ -39,7 +39,9 @@ module.exports = {
 
     plugins: [
         new webpack.EnvironmentPlugin(["API_TOKEN"]),
-        new CopyWebpackPlugin([ { from: 'static', to: 'static' } ])
+        new CopyWebpackPlugin({
+            patterns: [ { from: 'static', to: 'static' } ],
+        })
     ],
 
     target: 'web',
