@@ -1,7 +1,6 @@
 module Api exposing
     ( apiTimeout
     , errorToString
-    , floatAsStringDecoder
     , getHeaders
     , getUrl
     , loadSensorMeasurements
@@ -61,28 +60,12 @@ sponsorDecoder =
         |> Pipeline.optional "active" Decode.bool False
 
 
-{-| Parse a string as float. Fail if parsing does not succeed.
--}
-floatAsStringDecoder : Decode.Decoder Float
-floatAsStringDecoder =
-    Decode.string
-        |> Decode.andThen
-            (\str ->
-                case String.toFloat str of
-                    Just parsed ->
-                        Decode.succeed parsed
-
-                    Nothing ->
-                        Decode.fail "Could not parse string value as float"
-            )
-
-
 measurementDecoder : Decode.Decoder Measurement
 measurementDecoder =
     Decode.succeed Measurement
         |> Pipeline.required "id" Decode.int
         |> Pipeline.required "sensor_id" (Decode.nullable Decode.int)
-        |> Pipeline.required "temperature" floatAsStringDecoder
+        |> Pipeline.required "temperature" Decode.float
         |> Pipeline.required "created_at" DecodeExtra.datetime
 
 
