@@ -1,11 +1,11 @@
-module Views exposing (splitParagraphs, view)
+module Views exposing (splitParagraphsAndLinkify, view)
 
 import Browser
 import Charts exposing (temperatureChart)
 import Css exposing (..)
 import Css.Global as Global
 import Dict
-import Helpers exposing (formatTemperature)
+import Helpers exposing (formatTemperature, linkify)
 import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, h4, h5, h6, img, p, span, strong, text, toUnstyled)
 import Html.Styled.Attributes as Attr exposing (class, css, href, id, src)
 import Messages exposing (..)
@@ -343,7 +343,7 @@ sensorDescription now sensor sponsor =
                             [ css [ fontStyle italic ] ]
                             [ text sp.name ]
                         ]
-                            ++ splitParagraphs sp.description
+                            ++ splitParagraphsAndLinkify sp.description
                 )
                 sponsor
             )
@@ -368,10 +368,10 @@ fontHeading =
     ]
 
 
-{-| Split text at newline characters, create paragraphs
+{-| Split text at newline characters, create linkified paragraphs
 -}
-splitParagraphs : String -> List (Html msg)
-splitParagraphs str =
+splitParagraphsAndLinkify : String -> List (Html msg)
+splitParagraphsAndLinkify str =
     let
         isNotEmpty =
             not << String.isEmpty
@@ -380,6 +380,6 @@ splitParagraphs str =
             List.filter isNotEmpty (String.split "\n" str)
 
         textToParagraph =
-            \t -> p [] [ text t ]
+            \t -> p [] (linkify t)
     in
     List.map textToParagraph parts

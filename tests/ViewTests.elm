@@ -3,37 +3,37 @@ module ViewTests exposing (suite)
 import Expect exposing (Expectation)
 import Html.Styled exposing (Html, p, text)
 import Test exposing (..)
-import Views exposing (splitParagraphs)
+import Views exposing (splitParagraphsAndLinkify)
 
 
-testSplitParagraphs : String -> List (Html msg) -> (() -> Expectation)
-testSplitParagraphs given expected =
+testSplitParagraphsAndLinkify : String -> List (Html msg) -> (() -> Expectation)
+testSplitParagraphsAndLinkify given expected =
     \() ->
-        Expect.equal (splitParagraphs given) expected
+        Expect.equal (splitParagraphsAndLinkify given) expected
 
 
 suite : Test
 suite =
     describe "splitParagraphs"
         [ test "none" <|
-            testSplitParagraphs
+            testSplitParagraphsAndLinkify
                 "Hello"
                 [ p [] [ text "Hello" ] ]
         , test "simple" <|
-            testSplitParagraphs
-                "He\nllo"
+            testSplitParagraphsAndLinkify
+                "He\nllo world"
                 [ p [] [ text "He" ]
-                , p [] [ text "llo" ]
+                , p [] [ text "llo world" ]
                 ]
         , test "multiple" <|
-            testSplitParagraphs
+            testSplitParagraphsAndLinkify
                 "He\nl\nlo"
                 [ p [] [ text "He" ]
                 , p [] [ text "l" ]
                 , p [] [ text "lo" ]
                 ]
         , test "consecutive" <|
-            testSplitParagraphs
+            testSplitParagraphsAndLinkify
                 "He\n\nllo"
                 [ p [] [ text "He" ]
                 , p [] [ text "llo" ]
