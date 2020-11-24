@@ -61,7 +61,6 @@ type alias Sensor =
     , longitude : Float
     , sponsorId : Maybe Int
     , createdAt : Time.Posix
-    , updatedAt : Time.Posix
     , lastMeasurement : Maybe Measurement
     , historicMeasurements : Maybe (List Measurement)
     }

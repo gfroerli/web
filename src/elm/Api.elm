@@ -47,7 +47,6 @@ sensorDecoder =
         |> Pipeline.required "longitude" Decode.float
         |> Pipeline.required "sponsor_id" (Decode.nullable Decode.int)
         |> Pipeline.required "created_at" DecodeExtra.datetime
-        |> Pipeline.required "updated_at" DecodeExtra.datetime
         |> Pipeline.optional "last_measurement" (Decode.nullable measurementDecoder) Nothing
         |> Pipeline.hardcoded Nothing
 
