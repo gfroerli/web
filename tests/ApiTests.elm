@@ -79,11 +79,6 @@ suite =
                                         |> unpack
                                             (\_ -> Expect.fail "Could not parse createdAt expectation date")
                                             (\expected -> Expect.equal sensor.createdAt expected)
-                                , \sensor ->
-                                    Iso8601.toTime "2016-11-29T20:36:48.016Z"
-                                        |> unpack
-                                            (\_ -> Expect.fail "Could not parse updatedAt expectation date")
-                                            (\expected -> Expect.equal sensor.updatedAt expected)
                                 ]
                             )
                             result
