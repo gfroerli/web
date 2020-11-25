@@ -1,5 +1,3 @@
-require('./index.html');
-
 const entrypoint = require('../elm/Main.elm');
 window.entrypoint = entrypoint;
 

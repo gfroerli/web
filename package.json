@@ -1,6 +1,6 @@
 {
     "name": "gfroerli-web",
-    "main": "./src/index.js",
+    "main": "./src/static/index.js",
     "version": "0.2.0",
     "private": true,
     "devDependencies": {
@@ -10,10 +10,13 @@
         "elm-outdated": "^1.1.1",
         "elm-test": "0.19.1-revision4",
         "elm-webpack-loader": "^6",
-        "file-loader": "^6.1.1",
+        "handlebars": "^4.7.6",
+        "handlebars-loader": "^1.7.1",
+        "html-webpack-plugin": "^4.5.0",
         "webpack": "^4.44.2",
         "webpack-cli": "^3.3.12",
         "webpack-dev-server": "^3.11.0",
         "webpack-merge": "^5.2.0"
-    }
+    },
+    "dependencies": {}
 }
