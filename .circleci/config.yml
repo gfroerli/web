@@ -31,8 +31,12 @@ jobs:
       - run:
           name: Test project
           command: sysconfcpus -n 2 make test
+      - run:
+          name: Validate formatting
+          command: sysconfcpus -n 2 npx elm-format --validate src/
       - save_cache:
           key:  v3-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
           paths:
             - elm-stuff
             - node_modules
+
