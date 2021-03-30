@@ -6,8 +6,8 @@ import Css exposing (..)
 import Css.Global as Global
 import Dict
 import Helpers exposing (formatTemperature)
-import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, h4, h5, h6, img, p, span, strong, text, toUnstyled)
-import Html.Styled.Attributes as Attr exposing (class, css, href, id, src)
+import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, p, span, text, toUnstyled)
+import Html.Styled.Attributes exposing (css, href, id, src)
 import Messages exposing (..)
 import Models exposing (Alert, Model, Sensor, Severity(..), Sponsor)
 import Routing exposing (Route(..))
@@ -193,9 +193,9 @@ mapView model =
             [ a
                 [ href "https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh" ]
                 [ img [ src "/static/google-play-badge.png" ] [] ]
-            ,a
+            , a
                 [ href "https://apps.apple.com/us/app/gfr%C3%B6r-li/id1451431723" ]
-                [ img [ src "/static/AppStoreBadge.png" , css [marginLeft (px 8), height(px 50)]] [] ]
+                [ img [ src "/static/AppStoreBadge.png", css [ marginLeft (px 8), height (px 50) ] ] [] ]
             ]
         , div
             [ id "wrapper"
