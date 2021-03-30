@@ -59,6 +59,9 @@ system](https://guide.elm-lang.org/interop/javascript.html).
 Contributions are welcome. If you need any guidance, feel free to create an
 issue on Github or join our IRC channel #coredump on Freenode!
 
+Before committing, make sure to reformat your code with elm-format. You can do
+so using your IDE, or with `make format`.
+
 ## License
 
 Copyright © 2017–2020 Coredump Hackerspace.

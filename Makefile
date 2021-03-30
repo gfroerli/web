@@ -15,6 +15,9 @@ test:
 run:
 	npx webpack-dev-server --port 8000 --config webpack.dev.js
 
+format:
+	npx elm-format src/
+
 clean:
 	rm -rf dist/
 
