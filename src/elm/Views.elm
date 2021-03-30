@@ -193,6 +193,9 @@ mapView model =
             [ a
                 [ href "https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh" ]
                 [ img [ src "/static/google-play-badge.png" ] [] ]
+            ,a
+                [ href "https://apps.apple.com/us/app/gfr%C3%B6r-li/id1451431723" ]
+                [ img [ src "/static/AppStoreBadge.png" , css [marginLeft (px 8), height(px 50)]] [] ]
             ]
         , div
             [ id "wrapper"
