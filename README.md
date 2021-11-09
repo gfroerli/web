@@ -70,5 +70,5 @@ Licensed under the AGPLv3 or later, see `LICENSE.md`.
 
 
 <!-- Badges -->
-[circle-ci]: https://circleci.com/gh/coredump-ch/water-sensor-web/tree/master
-[circle-ci-badge]: https://circleci.com/gh/coredump-ch/water-sensor-web/tree/master.svg?style=shield
+[circle-ci]: https://circleci.com/gh/gfroerli/web/tree/master
+[circle-ci-badge]: https://circleci.com/gh/gfroerli/web/tree/master.svg?style=shield
