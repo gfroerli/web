@@ -47,7 +47,7 @@ aboutPath =
 
 githubPath : String
 githubPath =
-    "https://github.com/coredump-ch/water-sensor-web"
+    "https://github.com/gfroerli/web"
 
 
 coredumpPath : String
