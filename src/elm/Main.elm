@@ -9,7 +9,7 @@ import Map
 import MapPort
 import Maybe.Extra
 import Messages exposing (..)
-import Models exposing (Model)
+import Models exposing (Model, Sensor)
 import Routing exposing (toRoute)
 import Task
 import Time exposing (posixToMillis)
@@ -67,6 +67,13 @@ init flags url key =
 
 -- UPDATE
 
+filterActiveSensors : Sensor -> Bool
+filterActiveSensors sensor =
+let
+    createdAt = Maybe.map (\m -> m.createdAt) sensor.lastMeasurement
+in
+    
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -109,10 +116,13 @@ update msg model =
             ( Models.addErrorAlert model alertMsg, Cmd.none )
 
         SensorsLoaded (Ok sensors) ->
-            ( { model | selectedSensor = Nothing, sensors = sensors }
-            , List.map Api.toJsSensor sensors
-                |> MapPort.sensorsLoaded
-            )
+            let
+                filteredSensors = List.filter filterActiveSensors sensors
+            in
+                ( { model | selectedSensor = Nothing, sensors = filteredSensors }
+                , List.map Api.toJsSensor filteredSensors
+                    |> MapPort.sensorsLoaded
+                )
 
         SensorsLoaded (Err error) ->
             let
