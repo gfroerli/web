@@ -64,7 +64,7 @@ so using your IDE, or with `make format`.
 
 ## License
 
-Copyright © 2017–2020 Coredump Hackerspace.
+Copyright © 2017–2022 Coredump Hackerspace.
 
 Licensed under the AGPLv3 or later, see `LICENSE.md`.
 
