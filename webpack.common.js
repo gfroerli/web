@@ -18,20 +18,17 @@ module.exports = {
 
     output: {
         path: path.resolve(__dirname + '/dist'),
-        filename: '[name].[hash].js'
+        filename: '[name].[contenthash].js'
     },
 
     module: {
         rules: [
             {
-                test: /\.hbs$/,
-                exclude: /node_modules/,
-                loader: 'handlebars-loader'
-            },
-            {
                 test: /\.elm$/,
                 exclude: [/elm-stuff/, /node_modules/],
-                loader: 'elm-webpack-loader?verbose=true&warn=true'
+                use: {
+                    loader: 'elm-webpack-loader',
+                },
             }
         ],
 
@@ -41,7 +38,7 @@ module.exports = {
     plugins: [
         new webpack.EnvironmentPlugin(["API_TOKEN"]),
         new HtmlWebpackPlugin({
-            template: 'src/static/index.html.hbs',
+            template: 'src/static/index.html',
             minfy: false,
         }),
         new CopyWebpackPlugin({
