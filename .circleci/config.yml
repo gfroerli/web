@@ -3,6 +3,8 @@ jobs:
   build:
     docker:
       - image: node:16
+    environment:
+      API_TOKEN: 'asdfjklo'
     steps:
       - checkout
       - restore_cache:

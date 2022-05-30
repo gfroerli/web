@@ -13,7 +13,7 @@ test:
 	npx elm-test
 
 run:
-	npx webpack-dev-server --port 8000 --config webpack.dev.js
+	npx webpack serve --port 8000 --config webpack.dev.js
 
 format:
 	npx elm-format src/
