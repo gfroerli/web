@@ -2,12 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: node:10
+      - image: node:16
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v3-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
+            - v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
       - run:
           name: Install sysconfcpus to fix core count detection
           command: |
@@ -35,7 +35,7 @@ jobs:
           name: Validate formatting
           command: sysconfcpus -n 2 npx elm-format --validate src/
       - save_cache:
-          key:  v3-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
+          key:  v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
           paths:
             - elm-stuff
             - node_modules
