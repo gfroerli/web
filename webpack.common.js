@@ -18,7 +18,7 @@ module.exports = {
 
     output: {
         path: path.resolve(__dirname + '/dist'),
-        filename: '[name].[contenthash].js'
+        filename: '[name].[hash].js'
     },
 
     module: {
@@ -52,11 +52,12 @@ module.exports = {
     target: 'web',
 
     devServer: {
-        inline: true,
-        stats: {
-            colors: true,
-            hash: false,
-            modules: false,
+        devMiddleware: {
+            stats: {
+                colors: true,
+                hash: false,
+                modules: false,
+            },
         },
     },
 
