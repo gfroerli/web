@@ -342,11 +342,10 @@ sensorDescription now sensor sponsor =
             (Maybe.map
                 (\sp ->
                     div [] <|
-                        [ p
+                        p
                             [ css [ fontStyle italic ] ]
                             [ text sp.name ]
-                        ]
-                            ++ splitParagraphs sp.description
+                            :: splitParagraphs sp.description
                 )
                 sponsor
             )

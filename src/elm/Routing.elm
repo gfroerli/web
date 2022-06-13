@@ -7,7 +7,6 @@ module Routing exposing
     , toRoute
     )
 
-import Browser.Navigation as Nav
 import Url
 import Url.Parser exposing (Parser, map, oneOf, parse, s, top)
 
