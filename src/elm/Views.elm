@@ -186,7 +186,7 @@ mapView model =
         ("Finde die aktuelle und historische Wassertemperatur an "
             ++ (model.sensors |> List.length |> String.fromInt)
             ++ pluralize " Standort" " Standorten" (model.sensors |> List.length)
-            ++ " rund um den Zürichsee!"
+            ++ " in verschiedenen Seen der Schweiz!"
         )
         model.alerts
         [ div [ css [ position absolute, top (px 8), right (px 8) ] ]
