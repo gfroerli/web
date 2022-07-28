@@ -97,6 +97,9 @@ update msg model =
                         Routing.AboutRoute ->
                             Cmd.none
 
+                        Routing.PrivacyPolicyRoute ->
+                            Cmd.none
+
                         Routing.NotFoundRoute ->
                             Cmd.none
             in

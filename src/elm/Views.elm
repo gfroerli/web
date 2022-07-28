@@ -6,7 +6,7 @@ import Css exposing (..)
 import Css.Global as Global
 import Dict
 import Helpers exposing (formatTemperature)
-import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, p, span, text, toUnstyled)
+import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css, href, id, src)
 import Messages exposing (..)
 import Models exposing (Alert, Model, Sensor, Severity(..), Sponsor)
@@ -29,6 +29,9 @@ view model =
 
                 AboutRoute ->
                     aboutView
+
+                PrivacyPolicyRoute ->
+                    privacyPolicyView
 
                 NotFoundRoute ->
                     notFoundView
@@ -55,10 +58,11 @@ page subtitle alerts elements =
                 , Global.id "main" [ minHeight (vh 100) ]
                 , Global.h1 <| fontHeading ++ [ fontSize (em 3.4), marginBottom (px 16) ]
                 , Global.h2 <| fontHeading ++ [ fontSize (em 2.2), marginBottom (px 8) ]
-                , Global.h3 <| fontHeading ++ [ fontSize (em 1.6), marginBottom (px 8) ]
+                , Global.h3 <| fontHeading ++ [ fontSize (em 1.6), marginBottom (px 8), marginTop (px 32) ]
                 , Global.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
                 , Global.p [ lineHeight (em 1.5), marginBottom (px 8) ]
                 , Global.strong [ fontWeight bold ]
+                , Global.li [ listStyleType disc, listStylePosition inside ]
                 , Global.class "marker"
                     [ backgroundImage (url "/static/marker.svg")
                     , backgroundSize cover
@@ -143,7 +147,7 @@ aboutView =
         [ div
             [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
             [ h2 [] [ text "About" ]
-            , h3 [ css [ marginTop (px 16) ] ] [ text "Warum dieses Projekt?" ]
+            , h3 [ css [] ] [ text "Warum dieses Projekt?" ]
             , p [] [ text "Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es keine verlässliche Methode, um Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten." ]
             , p [] [ text "Es gibt heute bereits ein paar Wassertemperatur-Sensor-Netzwerke, aber meistens gibt es nur einen Sensor pro See, wodurch lokale Temperaturunterschiede (z.B. an einer Flussmündung) ignoriert werden. Viele Sensoren werden zudem nur ein mal pro Tag publiziert." ]
             , p [] [ text "Wir bauen ein Netzwerk von kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf.  Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen." ]
@@ -152,19 +156,51 @@ aboutView =
                 , a [ href Routing.githubPath ] [ text "auf Github" ]
                 , text " eingesehen und verbessert werden!"
                 ]
-            , h3 [ css [ marginTop (px 16) ] ] [ text "Wer hat diese Website entwickelt?" ]
+            , h3 [ css [] ] [ text "Wer hat diese Website entwickelt?" ]
             , p [] [ text "Diese Website, die Server-Infrastruktur wie auch die Sensor-Hardware werden vom Coredump Hackerspace in Rapperswil-Jona entwickelt." ]
             , p []
                 [ text "Mehr Informationen über uns findest du auf unserer Website: "
                 , a [ href Routing.coredumpPath ] [ text "www.coredump.ch" ]
                 ]
-            , h3 [ css [ marginTop (px 16) ] ] [ text "Wie kann ich selber so einen Sensor platzieren?" ]
+            , h3 [ css [] ] [ text "Wie kann ich selber so einen Sensor platzieren?" ]
             , p []
                 [ text "Kontaktiere uns doch unter "
                 , a [ href "mailto:gfroerli@coredump.ch" ] [ text "gfroerli@coredump.ch" ]
                 , text "!"
                 ]
             , a [ href Routing.mapPath, css [ display inlineBlock, marginTop (px 32) ] ] [ text "Zurück zur Karte" ]
+            ]
+        ]
+
+
+{-| View: Privacy Policy
+-}
+privacyPolicyView : Html Msg
+privacyPolicyView =
+    page
+        ""
+        []
+        [ div
+            [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
+            [ h2 [] [ text "Privacy Policy (Apps / Web)" ]
+            , p [] [ text "Verein Coredump built the Gfrörli apps and website as Open Source apps and website. This service is provided by Verein Coredump at no cost and is intended for use as is." ]
+            , p [] [ text "This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information if anyone decided to use our Service." ]
+            , h3 [ css [] ] [ text "Information Collection and Use" ]
+            , p [] [ text "We do not collect any personally identifiable information." ]
+            , p [] [ text "Crash reports are not collected by the app itself, but may be collected and submitted through your mobile operating system at your choice." ]
+            , h3 [ css [] ] [ text "Cookies" ]
+            , p [] [ text "Our website does not use any cookies for tracking or analytics purposes." ]
+            , h3 [ css [] ] [ text "Service Providers" ]
+            , p [] [ text "Our Android and Web applications make use of the following service providers:" ]
+            , ul []
+                [ li [] [ text "Map tiles provided by Mapbox" ]
+                ]
+            , h3 [ css [] ] [ text "Changes to This Privacy Policy" ]
+            , p [] [ text "We may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page." ]
+            , h3 [ css [] ] [ text "Contact Us" ]
+            , p [] [ text "If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at gfroerli@coredump.ch!" ]
+            , p [ css [ fontStyle italic, marginTop (px 32) ] ] [ text "This policy is effective as of 2022-07-28" ]
+            , a [ href Routing.mapPath, css [ display inlineBlock, marginTop (px 32) ] ] [ text "Back" ]
             ]
         ]
 
@@ -249,6 +285,8 @@ mapView model =
             [ text "© 2017–2022 Coredump Rapperswil-Jona"
             , text " | "
             , a [ href Routing.aboutPath ] [ text "About" ]
+            , text " | "
+            , a [ href Routing.privacyPolicyPath ] [ text "Privacy Policy" ]
             , text " | "
             , a [ href Routing.githubPath ] [ text "Code on Github" ]
             ]
