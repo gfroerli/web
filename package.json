@@ -8,12 +8,13 @@
         "dotenv": "^16",
         "elm": "0.19.1-5",
         "elm-format": "^0.8.5",
+        "elm-json": "^0.2.13",
         "elm-outdated": "^1.1.1",
-        "elm-test": "0.19.1-revision7",
+        "elm-test": "0.19.1-revision10",
         "elm-webpack-loader": "^8",
         "html-webpack-plugin": "^5.5.0",
         "webpack": "^5.72.1",
-        "webpack-cli": "^4.9.2",
+        "webpack-cli": "^5.0.0",
         "webpack-dev-server": "^4.9.0",
         "webpack-merge": "^5.2.0"
     }

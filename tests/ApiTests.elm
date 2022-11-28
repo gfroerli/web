@@ -125,8 +125,8 @@ suite =
                         in
                         unpack
                             (\errmsg ->
-                                Expect.true
-                                    ("Error \"" ++ errorToString errmsg ++ "\" did not match expectation")
+                                Expect.equal
+                                    True
                                     (String.contains
                                         "Expecting an OBJECT with a field named `caption`"
                                         (errorToString errmsg)
