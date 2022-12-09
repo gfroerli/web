@@ -228,5 +228,5 @@ subscriptions model =
         , MapPort.mapInitializationFailed MapInitializationFailed
         , MapPort.mapMoved MapDragged
         , MapPort.sensorClicked SensorClicked
-        , Time.every (10 * 1000) TimeUpdate
+        , Time.every (10 * 1000) TimeUpdate -- Update current time every 10 seconds
         ]

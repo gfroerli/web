@@ -9,7 +9,6 @@ module Api exposing
     , measurementDecoder
     , sensorDecoder
     , sponsorDecoder
-    , toJsMeasurement
     , toJsSensor
     )
 
@@ -20,7 +19,7 @@ import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
 import Map
 import Messages exposing (..)
-import Models exposing (JsMeasurement, JsSensor, Measurement, Sensor, Sponsor)
+import Models exposing (JsSensor, Measurement, Sensor, Sponsor)
 import Time exposing (Posix, millisToPosix, posixToMillis)
 
 
@@ -37,6 +36,13 @@ getHeaders apiToken =
 -- DECODERS
 
 
+{-| Decode a posix time (in seconds).
+-}
+posixSecondsTimeDecoder : Decode.Decoder Time.Posix
+posixSecondsTimeDecoder =
+    Decode.map (\seconds -> Time.millisToPosix (seconds * 1000)) Decode.int
+
+
 sensorDecoder : Decode.Decoder Sensor
 sensorDecoder =
     Decode.succeed Sensor
@@ -45,9 +51,10 @@ sensorDecoder =
         |> Pipeline.required "caption" (Decode.nullable Decode.string)
         |> Pipeline.required "latitude" Decode.float
         |> Pipeline.required "longitude" Decode.float
+        |> Pipeline.required "created_at" posixSecondsTimeDecoder
         |> Pipeline.required "sponsor_id" (Decode.nullable Decode.int)
-        |> Pipeline.required "created_at" DecodeExtra.datetime
-        |> Pipeline.optional "last_measurement" (Decode.nullable measurementDecoder) Nothing
+        |> Pipeline.required "latest_temperature" (Decode.nullable Decode.float)
+        |> Pipeline.required "latest_measurement_at" (Decode.nullable posixSecondsTimeDecoder)
         |> Pipeline.hardcoded Nothing
 
 
@@ -82,13 +89,7 @@ toJsSensor sensor =
             sensor.latitude
             sensor.longitude
         )
-        (Maybe.map toJsMeasurement sensor.lastMeasurement)
-
-
-toJsMeasurement : Measurement -> JsMeasurement
-toJsMeasurement measurement =
-    JsMeasurement
-        measurement.temperature
+        sensor.latestTemperature
 
 
 
@@ -105,11 +106,16 @@ getUrl path =
     "https://watertemp-api.coredump.ch/api/" ++ path
 
 
+getAppUrl : String -> String
+getAppUrl path =
+    "https://watertemp-api.coredump.ch/api/mobile_app/" ++ path
+
+
 loadSensors : String -> Cmd Msg
 loadSensors apiToken =
     let
         url =
-            getUrl "sensors"
+            getAppUrl "sensors"
     in
     Http.request
         { method = "GET"

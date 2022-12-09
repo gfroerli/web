@@ -305,12 +305,12 @@ sensorDescription now sensor sponsor =
             )
             -- Extract and show last measurement
             (Maybe.map
-                (\measurement ->
+                (\temperature ->
                     p
                         [ css [ fontStyle normal ] ]
-                        [ text (measurement.temperature |> String.fromFloat |> formatTemperature) ]
+                        [ text (temperature |> String.fromFloat |> formatTemperature) ]
                 )
-                sensor.lastMeasurement
+                sensor.latestTemperature
             )
         , h3 [] [ text "Temperaturverlauf (3 Tage)" ]
         , Maybe.withDefault

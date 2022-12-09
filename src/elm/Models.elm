@@ -1,6 +1,5 @@
 module Models exposing
     ( Alert
-    , JsMeasurement
     , JsSensor
     , Measurement
     , Model
@@ -59,9 +58,10 @@ type alias Sensor =
     , caption : Maybe String
     , latitude : Float
     , longitude : Float
-    , sponsorId : Maybe Int
     , createdAt : Time.Posix
-    , lastMeasurement : Maybe Measurement
+    , sponsorId : Maybe Int
+    , latestTemperature : Maybe Float
+    , latestMeasurementAt : Maybe Time.Posix
     , historicMeasurements : Maybe (List Measurement)
     }
 
@@ -78,7 +78,7 @@ type alias JsSensor =
     , deviceName : String
     , caption : Maybe String
     , pos : Map.Pos
-    , lastMeasurement : Maybe JsMeasurement
+    , latestTemperature : Maybe Float
     }
 
 
@@ -87,9 +87,4 @@ type alias Measurement =
     , sensorId : Maybe Int
     , temperature : Float
     , createdAt : Time.Posix
-    }
-
-
-type alias JsMeasurement =
-    { temperature : Float
     }
