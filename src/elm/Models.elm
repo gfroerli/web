@@ -1,9 +1,11 @@
 module Models exposing
     ( Alert
+    , DelayedSensorDetails(..)
     , JsSensor
     , Measurement
     , Model
     , Sensor
+    , SensorDetails
     , Severity(..)
     , Sponsor
     , addErrorAlert
@@ -26,6 +28,12 @@ type alias Alert =
     }
 
 
+type DelayedSensorDetails
+    = Loaded SensorDetails
+    | Loading
+    | Missing
+
+
 {-| Add an error alert message to the model.
 -}
 addErrorAlert : Model -> String -> Model
@@ -44,7 +52,7 @@ type alias Model =
     , route : Route
     , map : Map.Model
     , sensors : List Sensor
-    , selectedSensor : Maybe Sensor
+    , selectedSensor : DelayedSensorDetails
     , sponsors : Dict Int Sponsor
     , apiToken : String
     , now : Maybe Time.Posix
@@ -63,6 +71,23 @@ type alias Sensor =
     , latestTemperature : Maybe Float
     , latestMeasurementAt : Maybe Time.Posix
     , historicMeasurements : Maybe (List Measurement)
+    }
+
+
+type alias SensorDetails =
+    { id : Int
+    , deviceName : String
+    , caption : Maybe String
+    , latitude : Float
+    , longitude : Float
+    , createdAt : Time.Posix
+    , sponsorId : Maybe Int
+    , latestTemperature : Maybe Float
+    , latestMeasurementAt : Maybe Time.Posix
+    , historicMeasurements : Maybe (List Measurement)
+    , averageTemperature : Maybe Float
+    , minimumTemperature : Maybe Float
+    , maximumTemperature : Maybe Float
     }
 
 

@@ -17,6 +17,7 @@
             "elm-community/json-extra": "4.3.0",
             "elm-community/list-extra": "8.7.0",
             "elm-community/maybe-extra": "5.3.0",
+            "icidasset/elm-material-icons": "11.0.0",
             "rtfeldman/elm-css": "18.0.0",
             "rtfeldman/elm-iso8601-date-strings": "1.1.4",
             "terezka/line-charts": "2.0.1"

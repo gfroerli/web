@@ -3,7 +3,6 @@ module ApiTests exposing (suite)
 import Api exposing (getHeaders, measurementDecoder, sensorDecoder)
 import Expect exposing (FloatingPointTolerance(..))
 import Http
-import Iso8601
 import Json.Decode as Decode exposing (errorToString)
 import Result.Extra exposing (unpack)
 import Test exposing (Test, describe, test)
@@ -18,7 +17,9 @@ suite =
                 \() ->
                     Expect.equal
                         (getHeaders "foo")
-                        [ Http.header "Authorization" "Bearer foo" ]
+                        [ Http.header "Authorization" "Bearer foo"
+                        , Http.header "Cache-Control" "no-store"
+                        ]
             ]
         , describe "Decoders"
             [ describe "sensorDecoder"

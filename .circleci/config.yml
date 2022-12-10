@@ -9,7 +9,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
+            - v5-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
       - run:
           name: Install sysconfcpus to fix core count detection
           command: |
@@ -23,12 +23,15 @@ jobs:
           command: >
             mkdir ~/.npm-global
             && npm config set prefix '~/.npm-global'
-            && npm install --unsafe-perm -g elm@0.19.0-bugfix6
+            && npm install --unsafe-perm -g elm@0.19.1-5
       - run:
           name: Install dependencies
           command: sysconfcpus -n 2 make setup
       - run:
           name: Build project
+          command: sysconfcpus -n 2 npx elm make src/elm/Main.elm && rm index.html
+      - run:
+          name: Build dist
           command: sysconfcpus -n 2 make dist
       - run:
           name: Test project
@@ -37,7 +40,7 @@ jobs:
           name: Validate formatting
           command: sysconfcpus -n 2 npx elm-format --validate src/
       - save_cache:
-          key:  v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
+          key:  v5-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
           paths:
             - elm-stuff
             - node_modules

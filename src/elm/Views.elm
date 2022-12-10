@@ -5,11 +5,13 @@ import Charts exposing (temperatureChart)
 import Css exposing (..)
 import Css.Global as Global
 import Dict
-import Helpers exposing (formatTemperature)
-import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
+import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
+import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, styled, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css, href, id, src)
+import Material.Icons.Outlined as Outlined
+import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
-import Models exposing (Alert, Model, Sensor, Severity(..), Sponsor)
+import Models exposing (Alert, DelayedSensorDetails(..), Model, SensorDetails, Severity(..), Sponsor)
 import Routing exposing (Route(..))
 import Time
 
@@ -295,29 +297,45 @@ mapView model =
 
 sidebarContents : Model -> List (Html Msg)
 sidebarContents model =
-    [ h2
-        [ css [ marginBottom (em 0.5) ] ]
-        [ text <| Maybe.withDefault "Details" (Maybe.map .deviceName model.selectedSensor) ]
-    , Maybe.withDefault
-        (p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ])
-        (Maybe.map
-            (\sensor ->
-                sensorDescription model.now
-                    sensor
-                    (Maybe.andThen
-                        (\sponsorId -> Dict.get sponsorId model.sponsors)
-                        sensor.sponsorId
-                    )
-            )
-            model.selectedSensor
-        )
+    let
+        headingStyle =
+            [ css [ marginBottom (em 0.5) ] ]
+    in
+    case ( model.selectedSensor, model.now ) of
+        ( Missing, _ ) ->
+            [ h2 headingStyle [ text "Details" ]
+            , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
+            ]
 
-    --(Maybe.map (\s -> sensorDescription model.now s) model.selectedSensor)
-    ]
+        ( Loading, _ ) ->
+            [ h2 headingStyle [ text "Details" ]
+            , p [] [ text "Sensor wird geladen..." ]
+            ]
+
+        ( Loaded sensor, Nothing ) ->
+            [ h2 headingStyle [ text "Details" ]
+            , p [] [ text "Aktuelle Uhrzeit wird geladen..." ]
+            ]
+
+        ( Loaded sensor, Just now ) ->
+            [ h2 headingStyle [ text sensor.deviceName ]
+            , sensorDescription now
+                sensor
+                (Maybe.andThen
+                    (\sponsorId -> Dict.get sponsorId model.sponsors)
+                    sensor.sponsorId
+                )
+            ]
 
 
-sensorDescription : Maybe Time.Posix -> Sensor -> Maybe Sponsor -> Html Msg
+sensorDescription : Time.Posix -> SensorDetails -> Maybe Sponsor -> Html Msg
 sensorDescription now sensor sponsor =
+    let
+        lastMeasurementTimeAgo =
+            Maybe.map
+                (\latestMeasurementAt -> posixTimeDeltaSeconds latestMeasurementAt now |> approximateTimeAgo)
+                sensor.latestMeasurementAt
+    in
     div []
         [ Maybe.withDefault
             -- Fallback if there is no caption
@@ -334,22 +352,29 @@ sensorDescription now sensor sponsor =
                 )
                 sensor.caption
             )
-        , h3 [] [ text "Letzte Messung" ]
-        , Maybe.withDefault
-            -- Fallback if there is no measurement
-            (p
-                [ css [ fontStyle italic ] ]
-                [ text "Keine Messung" ]
-            )
-            -- Extract and show last measurement
-            (Maybe.map
-                (\temperature ->
-                    p
-                        [ css [ fontStyle normal ] ]
-                        [ text (temperature |> String.fromFloat |> formatTemperature) ]
-                )
-                sensor.latestTemperature
-            )
+        , case ( sensor.latestTemperature, lastMeasurementTimeAgo ) of
+            ( Just temperature, Just timeAgo ) ->
+                let
+                    temperatureString =
+                        temperature |> String.fromFloat |> formatTemperature
+                in
+                p
+                    [ css [ fontStyle normal ] ]
+                    [ span
+                        [ css
+                            [ position relative
+                            , top (px 2)
+                            , marginRight (px 4)
+                            ]
+                        ]
+                        [ fromUnstyled <| Outlined.thermostat 16 Inherit ]
+                    , text <| temperatureString ++ " (" ++ timeAgo ++ ")"
+                    ]
+
+            _ ->
+                p
+                    [ css [ fontStyle italic ] ]
+                    [ text "Keine Messung" ]
         , h3 [] [ text "Temperaturverlauf (3 Tage)" ]
         , Maybe.withDefault
             -- Fallback if there are no historic measurements
@@ -364,13 +389,26 @@ sensorDescription now sensor sponsor =
                         [] ->
                             p
                                 [ css [ fontStyle italic ] ]
-                                [ text "No recent measurements" ]
+                                [ text "Keine Messungen in den letzten 3 Tagen" ]
 
                         mm ->
                             fromUnstyled <| temperatureChart now mm
                 )
                 sensor.historicMeasurements
             )
+        , h3 [] [ text "Statistiken (Alle Messungen)" ]
+        , case ( sensor.minimumTemperature, sensor.maximumTemperature, sensor.averageTemperature ) of
+            ( Just min, Just max, Just avg ) ->
+                p []
+                    [ text <| "Min: " ++ (min |> String.fromFloat |> formatTemperature)
+                    , text " | "
+                    , text <| "Max: " ++ (max |> String.fromFloat |> formatTemperature)
+                    , text " | "
+                    , text <| "Avg: " ++ (avg |> String.fromFloat |> formatTemperature)
+                    ]
+
+            _ ->
+                p [ css [ fontStyle italic ] ] [ text "Keine Statistiken vorhanden" ]
         , h3 [] [ text "Sponsor" ]
         , Maybe.withDefault
             (p
