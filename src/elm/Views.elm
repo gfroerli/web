@@ -9,7 +9,7 @@ import Helpers exposing (formatTemperature)
 import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css, href, id, src)
 import Messages exposing (..)
-import Models exposing (Alert, Model, Sensor, Severity(..), Sponsor)
+import Models exposing (Alert, DelayedSensorDetails(..), Model, Sensor, SensorDetails, Severity(..), Sponsor)
 import Routing exposing (Route(..))
 import Time
 
@@ -295,28 +295,33 @@ mapView model =
 
 sidebarContents : Model -> List (Html Msg)
 sidebarContents model =
-    [ h2
-        [ css [ marginBottom (em 0.5) ] ]
-        [ text <| Maybe.withDefault "Details" (Maybe.map .deviceName model.selectedSensor) ]
-    , Maybe.withDefault
-        (p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ])
-        (Maybe.map
-            (\sensor ->
-                sensorDescription model.now
-                    sensor
-                    (Maybe.andThen
-                        (\sponsorId -> Dict.get sponsorId model.sponsors)
-                        sensor.sponsorId
-                    )
-            )
-            model.selectedSensor
-        )
+    let
+        headingStyle =
+            [ css [ marginBottom (em 0.5) ] ]
+    in
+    case model.selectedSensor of
+        Missing ->
+            [ h2 headingStyle [ text "Details" ]
+            , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
+            ]
 
-    --(Maybe.map (\s -> sensorDescription model.now s) model.selectedSensor)
-    ]
+        Loading ->
+            [ h2 headingStyle [ text "Details" ]
+            , p [] [ text "Sensor wird geladen..." ]
+            ]
+
+        Loaded sensor ->
+            [ h2 headingStyle [ text sensor.deviceName ]
+            , sensorDescription model.now
+                sensor
+                (Maybe.andThen
+                    (\sponsorId -> Dict.get sponsorId model.sponsors)
+                    sensor.sponsorId
+                )
+            ]
 
 
-sensorDescription : Maybe Time.Posix -> Sensor -> Maybe Sponsor -> Html Msg
+sensorDescription : Maybe Time.Posix -> SensorDetails -> Maybe Sponsor -> Html Msg
 sensorDescription now sensor sponsor =
     div []
         [ Maybe.withDefault

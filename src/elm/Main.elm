@@ -7,9 +7,8 @@ import Dict
 import List.Extra exposing (find)
 import Map
 import MapPort
-import Maybe.Extra
 import Messages exposing (..)
-import Models exposing (Model)
+import Models exposing (DelayedSensorDetails(..), Model)
 import Routing exposing (toRoute)
 import Task
 import Time exposing (posixToMillis)
@@ -51,7 +50,7 @@ init flags url key =
       , route = currentRoute
       , map = map
       , sensors = []
-      , selectedSensor = Nothing
+      , selectedSensor = Missing
       , sponsors = Dict.empty
       , apiToken = flags.apiToken
       , now = Nothing
@@ -129,12 +128,36 @@ update msg model =
                         )
                         sensors
             in
-            ( { model | selectedSensor = Nothing, sensors = filteredSensors }
+            ( { model | selectedSensor = Missing, sensors = filteredSensors }
             , List.map Api.toJsSensor filteredSensors
                 |> MapPort.sensorsLoaded
             )
 
         SensorsLoaded (Err error) ->
+            let
+                alertMsg =
+                    "Sensoren konnten nicht geladen werden: " ++ Api.errorToString error
+            in
+            ( Models.addErrorAlert model alertMsg, Cmd.none )
+
+        SensorDetailsLoaded (Ok sensorDetails) ->
+            let
+                -- Trigger loading of sensor measurements
+                cmdMeasurements =
+                    case model.now of
+                        Just now ->
+                            Api.loadSensorMeasurements
+                                model.apiToken
+                                now
+                                sensorDetails.id
+                                (3600 * 24 * 3)
+
+                        _ ->
+                            Cmd.none
+            in
+            ( { model | selectedSensor = Loaded sensorDetails }, cmdMeasurements )
+
+        SensorDetailsLoaded (Err error) ->
             let
                 alertMsg =
                     "Sensoren konnten nicht geladen werden: " ++ Api.errorToString error
@@ -163,8 +186,21 @@ update msg model =
                 -- Get selected sensor if the sensor id in the received
                 -- measurements matches its id.
                 sensor =
-                    Maybe.Extra.filter (\s -> s.id == sensorId) model.selectedSensor
+                    case model.selectedSensor of
+                        Missing ->
+                            Nothing
 
+                        Loading ->
+                            Nothing
+
+                        Loaded sensorDetails ->
+                            if sensorDetails.id == sensorId then
+                                Just sensorDetails
+
+                            else
+                                Nothing
+
+                -- Update the model if the measurements belong to the current sensor
                 updatedModel =
                     case sensor of
                         Just s ->
@@ -175,7 +211,7 @@ update msg model =
                                 updatedSensor =
                                     { s | historicMeasurements = Just sortedMeasurements }
                             in
-                            { model | selectedSensor = Just updatedSensor }
+                            { model | selectedSensor = Loaded updatedSensor }
 
                         Nothing ->
                             model
@@ -212,18 +248,11 @@ update msg model =
                     find (\sensor -> sensor.id == jsSensor.id)
                         model.sensors
 
-                cmdMeasurements =
-                    case ( model.now, selectedSensor ) of
-                        ( Just now, Just sensor ) ->
-                            Api.loadSensorMeasurements
-                                model.apiToken
-                                now
-                                sensor.id
-                                (3600 * 24 * 3)
+                -- Trigger loading of sensor details
+                cmdSensorDetails =
+                    Api.loadSensorDetails model.apiToken jsSensor.id
 
-                        _ ->
-                            Cmd.none
-
+                -- If not yet present, trigger loading of sponsor
                 cmdSponsor =
                     case Maybe.map .sponsorId selectedSensor of
                         Just (Just sponsorId) ->
@@ -233,12 +262,12 @@ update msg model =
                             Cmd.none
 
                 cmd =
-                    Cmd.batch [ cmdMeasurements, cmdSponsor ]
+                    Cmd.batch [ cmdSensorDetails, cmdSponsor ]
             in
-            ( { model | selectedSensor = selectedSensor }, cmd )
+            ( { model | selectedSensor = Loading }, cmd )
 
         SensorClicked Nothing ->
-            ( { model | selectedSensor = Nothing }, Cmd.none )
+            ( { model | selectedSensor = Missing }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

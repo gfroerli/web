@@ -3,6 +3,7 @@ module Api exposing
     , errorToString
     , getHeaders
     , getUrl
+    , loadSensorDetails
     , loadSensorMeasurements
     , loadSensors
     , loadSponsor
@@ -19,7 +20,7 @@ import Json.Decode.Extra as DecodeExtra
 import Json.Decode.Pipeline as Pipeline
 import Map
 import Messages exposing (..)
-import Models exposing (JsSensor, Measurement, Sensor, Sponsor)
+import Models exposing (JsSensor, Measurement, Sensor, SensorDetails, Sponsor)
 import Time exposing (Posix, millisToPosix, posixToMillis)
 
 
@@ -56,6 +57,24 @@ sensorDecoder =
         |> Pipeline.required "latest_temperature" (Decode.nullable Decode.float)
         |> Pipeline.required "latest_measurement_at" (Decode.nullable posixSecondsTimeDecoder)
         |> Pipeline.hardcoded Nothing
+
+
+sensorDetailsDecoder : Decode.Decoder SensorDetails
+sensorDetailsDecoder =
+    Decode.succeed SensorDetails
+        |> Pipeline.required "id" Decode.int
+        |> Pipeline.required "device_name" Decode.string
+        |> Pipeline.required "caption" (Decode.nullable Decode.string)
+        |> Pipeline.required "latitude" Decode.float
+        |> Pipeline.required "longitude" Decode.float
+        |> Pipeline.required "created_at" posixSecondsTimeDecoder
+        |> Pipeline.required "sponsor_id" (Decode.nullable Decode.int)
+        |> Pipeline.optional "latest_temperature" (Decode.nullable Decode.float) Nothing
+        |> Pipeline.optional "latest_measurement_at" (Decode.nullable posixSecondsTimeDecoder) Nothing
+        |> Pipeline.hardcoded Nothing
+        |> Pipeline.required "average_temperature" (Decode.nullable Decode.float)
+        |> Pipeline.required "minimum_temperature" (Decode.nullable Decode.float)
+        |> Pipeline.required "maximum_temperature" (Decode.nullable Decode.float)
 
 
 sponsorDecoder : Decode.Decoder Sponsor
@@ -123,6 +142,23 @@ loadSensors apiToken =
         , url = url
         , body = Http.emptyBody
         , expect = Http.expectJson SensorsLoaded (Decode.list sensorDecoder)
+        , timeout = Just apiTimeout
+        , tracker = Nothing
+        }
+
+
+loadSensorDetails : String -> Int -> Cmd Msg
+loadSensorDetails apiToken sensorId =
+    let
+        url =
+            getAppUrl "sensors/" ++ String.fromInt sensorId
+    in
+    Http.request
+        { method = "GET"
+        , headers = getHeaders apiToken
+        , url = url
+        , body = Http.emptyBody
+        , expect = Http.expectJson SensorDetailsLoaded sensorDetailsDecoder
         , timeout = Just apiTimeout
         , tracker = Nothing
         }
