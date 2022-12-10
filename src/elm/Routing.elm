@@ -4,6 +4,7 @@ module Routing exposing
     , coredumpPath
     , githubPath
     , mapPath
+    , privacyPolicyPath
     , toRoute
     )
 
@@ -14,6 +15,7 @@ import Url.Parser exposing (Parser, map, oneOf, parse, s, top)
 type Route
     = MapRoute
     | AboutRoute
+    | PrivacyPolicyRoute
     | NotFoundRoute
 
 
@@ -22,6 +24,7 @@ routeParser =
     oneOf
         [ map MapRoute top
         , map AboutRoute (s "about")
+        , map PrivacyPolicyRoute (s "privacy-policy")
         ]
 
 
@@ -42,6 +45,11 @@ mapPath =
 aboutPath : String
 aboutPath =
     "/about"
+
+
+privacyPolicyPath : String
+privacyPolicyPath =
+    "/privacy-policy"
 
 
 githubPath : String
