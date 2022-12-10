@@ -19,13 +19,7 @@ jobs:
             make && make install;
             cd ..;
       - run:
-          name: Install elm
-          command: >
-            mkdir ~/.npm-global
-            && npm config set prefix '~/.npm-global'
-            && npm install --unsafe-perm -g elm@0.19.1-5
-      - run:
-          name: Install dependencies
+          name: Install elm and dependencies
           command: sysconfcpus -n 2 make setup
       - run:
           name: Build project
