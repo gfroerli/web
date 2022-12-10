@@ -9,7 +9,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
+            - v5-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
       - run:
           name: Install sysconfcpus to fix core count detection
           command: |
@@ -40,7 +40,7 @@ jobs:
           name: Validate formatting
           command: sysconfcpus -n 2 npx elm-format --validate src/
       - save_cache:
-          key:  v4-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
+          key:  v5-cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
           paths:
             - elm-stuff
             - node_modules
