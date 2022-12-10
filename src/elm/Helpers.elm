@@ -47,31 +47,31 @@ Note: Currently not internationalized, returning German durations only.
 approximateTimeAgo : Int -> String
 approximateTimeAgo secondsAgo =
     if secondsAgo < 30 then
-        "Vor wenigen Sekunden"
+        "vor wenigen Sekunden"
 
     else if secondsAgo < 120 then
-        "Vor etwa einer Minute"
+        "vor etwa einer Minute"
 
     else if secondsAgo < 3600 then
-        "Vor " ++ String.fromInt (secondsAgo // 60) ++ " Minuten"
+        "vor " ++ String.fromInt (secondsAgo // 60) ++ " Minuten"
 
     else if secondsAgo < 7200 then
-        "Vor mehr als einer Stunde"
+        "vor mehr als einer Stunde"
 
     else if secondsAgo < (24 * 3600) then
-        "Vor mehreren Stunden"
+        "vor mehreren Stunden"
 
     else if secondsAgo < (24 * 3600 * 2) then
-        "Vor einem Tag"
+        "vor einem Tag"
 
     else if secondsAgo < (24 * 3600 * 7) then
-        "Vor " ++ String.fromInt (secondsAgo // 3600 // 24) ++ " Tagen"
+        "vor " ++ String.fromInt (secondsAgo // 3600 // 24) ++ " Tagen"
 
     else if secondsAgo < (24 * 3600 * 30) then
-        "Vor mehr als einer Woche"
+        "vor mehr als einer Woche"
 
     else if secondsAgo < (24 * 3600 * 30 * 3) then
-        "Vor mehr als einem Monat"
+        "vor mehr als einem Monat"
 
     else
-        "Vor langer Zeit"
+        "vor langer Zeit"

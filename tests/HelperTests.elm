@@ -39,34 +39,34 @@ suite =
             ]
         , describe "approximateTimeAgo"
             [ test "3 seconds" <|
-                testApproximateTimeAgo 3 "Vor wenigen Sekunden"
+                testApproximateTimeAgo 3 "vor wenigen Sekunden"
             , test "29 seconds" <|
-                testApproximateTimeAgo 29 "Vor wenigen Sekunden"
+                testApproximateTimeAgo 29 "vor wenigen Sekunden"
             , test "30 seconds" <|
-                testApproximateTimeAgo 30 "Vor etwa einer Minute"
+                testApproximateTimeAgo 30 "vor etwa einer Minute"
             , test "119 seconds" <|
-                testApproximateTimeAgo 119 "Vor etwa einer Minute"
+                testApproximateTimeAgo 119 "vor etwa einer Minute"
             , test "120 seconds" <|
-                testApproximateTimeAgo 120 "Vor 2 Minuten"
+                testApproximateTimeAgo 120 "vor 2 Minuten"
             , test "58 minutes 50 seconds" <|
-                testApproximateTimeAgo (58 * 60 + 50) "Vor 58 Minuten"
+                testApproximateTimeAgo (58 * 60 + 50) "vor 58 Minuten"
             , test "59 minutes 59 seconds" <|
-                testApproximateTimeAgo (3600 - 1) "Vor 59 Minuten"
+                testApproximateTimeAgo (3600 - 1) "vor 59 Minuten"
             , test "90 minutes" <|
-                testApproximateTimeAgo (90 * 60) "Vor mehr als einer Stunde"
+                testApproximateTimeAgo (90 * 60) "vor mehr als einer Stunde"
             , test "17 hours" <|
-                testApproximateTimeAgo (17 * 3600 + 30) "Vor mehreren Stunden"
+                testApproximateTimeAgo (17 * 3600 + 30) "vor mehreren Stunden"
             , test "25 hours" <|
-                testApproximateTimeAgo (25 * 3600) "Vor einem Tag"
+                testApproximateTimeAgo (25 * 3600) "vor einem Tag"
             , test "48 hours" <|
-                testApproximateTimeAgo (48 * 3600) "Vor 2 Tagen"
+                testApproximateTimeAgo (48 * 3600) "vor 2 Tagen"
             , test "96 hours" <|
-                testApproximateTimeAgo (96 * 3600) "Vor 4 Tagen"
+                testApproximateTimeAgo (96 * 3600) "vor 4 Tagen"
             , test "8 days" <|
-                testApproximateTimeAgo (24 * 3600 * 8) "Vor mehr als einer Woche"
+                testApproximateTimeAgo (24 * 3600 * 8) "vor mehr als einer Woche"
             , test "32 days" <|
-                testApproximateTimeAgo (24 * 3600 * 32) "Vor mehr als einem Monat"
+                testApproximateTimeAgo (24 * 3600 * 32) "vor mehr als einem Monat"
             , test "120 days" <|
-                testApproximateTimeAgo (24 * 3600 * 120) "Vor langer Zeit"
+                testApproximateTimeAgo (24 * 3600 * 120) "vor langer Zeit"
             ]
         ]

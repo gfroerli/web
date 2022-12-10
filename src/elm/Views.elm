@@ -6,8 +6,10 @@ import Css exposing (..)
 import Css.Global as Global
 import Dict
 import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
-import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
+import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, styled, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css, href, id, src)
+import Material.Icons.Outlined as Outlined
+import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
 import Models exposing (Alert, DelayedSensorDetails(..), Model, SensorDetails, Severity(..), Sponsor)
 import Routing exposing (Route(..))
@@ -350,29 +352,29 @@ sensorDescription now sensor sponsor =
                 )
                 sensor.caption
             )
-        , h3 []
-            [ case lastMeasurementTimeAgo of
-                Just timeAgo ->
-                    text <| "Letzte Messung (" ++ timeAgo ++ ")"
+        , case ( sensor.latestTemperature, lastMeasurementTimeAgo ) of
+            ( Just temperature, Just timeAgo ) ->
+                let
+                    temperatureString =
+                        temperature |> String.fromFloat |> formatTemperature
+                in
+                p
+                    [ css [ fontStyle normal ] ]
+                    [ span
+                        [ css
+                            [ position relative
+                            , top (px 2)
+                            , marginRight (px 4)
+                            ]
+                        ]
+                        [ fromUnstyled <| Outlined.thermostat 16 Inherit ]
+                    , text <| temperatureString ++ " (" ++ timeAgo ++ ")"
+                    ]
 
-                Nothing ->
-                    text "Letzte Messung"
-            ]
-        , Maybe.withDefault
-            -- Fallback if there is no measurement
-            (p
-                [ css [ fontStyle italic ] ]
-                [ text "Keine Messung" ]
-            )
-            -- Extract and show last measurement
-            (Maybe.map
-                (\temperature ->
-                    p
-                        [ css [ fontStyle normal ] ]
-                        [ text (temperature |> String.fromFloat |> formatTemperature) ]
-                )
-                sensor.latestTemperature
-            )
+            _ ->
+                p
+                    [ css [ fontStyle italic ] ]
+                    [ text "Keine Messung" ]
         , h3 [] [ text "Temperaturverlauf (3 Tage)" ]
         , Maybe.withDefault
             -- Fallback if there are no historic measurements
