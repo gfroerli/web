@@ -26,7 +26,7 @@ formatTemperature : String -> String
 formatTemperature temp =
     case primitiveRound temp 2 of
         Just t ->
-            t ++ "°C"
+            t ++ " °C"
 
         Nothing ->
             "invalid"

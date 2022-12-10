@@ -389,13 +389,26 @@ sensorDescription now sensor sponsor =
                         [] ->
                             p
                                 [ css [ fontStyle italic ] ]
-                                [ text "No recent measurements" ]
+                                [ text "Keine Messungen in den letzten 3 Tagen" ]
 
                         mm ->
                             fromUnstyled <| temperatureChart now mm
                 )
                 sensor.historicMeasurements
             )
+        , h3 [] [ text "Statistiken (Alle Messungen)" ]
+        , case ( sensor.minimumTemperature, sensor.maximumTemperature, sensor.averageTemperature ) of
+            ( Just min, Just max, Just avg ) ->
+                p []
+                    [ text <| "Min: " ++ (min |> String.fromFloat |> formatTemperature)
+                    , text " | "
+                    , text <| "Max: " ++ (max |> String.fromFloat |> formatTemperature)
+                    , text " | "
+                    , text <| "Avg: " ++ (avg |> String.fromFloat |> formatTemperature)
+                    ]
+
+            _ ->
+                p [ css [ fontStyle italic ] ] [ text "Keine Statistiken vorhanden" ]
         , h3 [] [ text "Sponsor" ]
         , Maybe.withDefault
             (p
