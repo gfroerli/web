@@ -30,7 +30,9 @@ import Time exposing (Posix, millisToPosix, posixToMillis)
 
 getHeaders : String -> List Http.Header
 getHeaders apiToken =
-    [ Http.header "Authorization" ("Bearer " ++ apiToken) ]
+    [ Http.header "Authorization" ("Bearer " ++ apiToken)
+    , Http.header "Cache-Control" "no-store"
+    ]
 
 
 
