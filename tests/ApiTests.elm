@@ -2,12 +2,12 @@ module ApiTests exposing (suite)
 
 import Api exposing (getHeaders, measurementDecoder, sensorDecoder)
 import Expect exposing (FloatingPointTolerance(..))
-import Fuzz exposing (Fuzzer, int, list, string)
 import Http
 import Iso8601
 import Json.Decode as Decode exposing (errorToString)
 import Result.Extra exposing (unpack)
 import Test exposing (Test, describe, test)
+import Time
 
 
 suite : Test
@@ -34,8 +34,9 @@ suite =
                                     , "latitude": 1.00
                                     , "longitude": 2.00
                                     , "sponsor_id": null
-                                    , "created_at": "2016-11-29T20:35:21.813Z"
-                                    , "updated_at": "2016-11-29T20:36:48.016Z"
+                                    , "created_at": 1670632950
+                                    , "latest_temperature": null
+                                    , "latest_measurement_at": null
                                     }
                                     """
                         in
@@ -60,8 +61,9 @@ suite =
                                     , "latitude": 1.00
                                     , "longitude": 2.00
                                     , "sponsor_id": 7
-                                    , "created_at": "2016-11-29T20:35:21.813Z"
-                                    , "updated_at": "2016-11-29T20:36:48.016Z"
+                                    , "created_at": 1670632950
+                                    , "latest_temperature": 13.37
+                                    , "latest_measurement_at": 1670632960
                                     }
                                     """
                         in
@@ -74,11 +76,9 @@ suite =
                                 , \sensor -> Expect.equal sensor.latitude 1.0
                                 , \sensor -> Expect.equal sensor.longitude 2.0
                                 , \sensor -> Expect.equal sensor.sponsorId (Just 7)
-                                , \sensor ->
-                                    Iso8601.toTime "2016-11-29T20:35:21.813Z"
-                                        |> unpack
-                                            (\_ -> Expect.fail "Could not parse createdAt expectation date")
-                                            (\expected -> Expect.equal sensor.createdAt expected)
+                                , \sensor -> Expect.equal sensor.createdAt (Time.millisToPosix 1670632950000)
+                                , \sensor -> Expect.equal sensor.latestTemperature (Just 13.37)
+                                , \sensor -> Expect.equal sensor.latestMeasurementAt (Just (Time.millisToPosix 1670632960000))
                                 ]
                             )
                             result
@@ -94,8 +94,9 @@ suite =
                                     , "latitude": 1.00
                                     , "longitude": 2.00
                                     , "sponsor_id": null
-                                    , "created_at": "2016-11-29T20:35:21.813Z"
-                                    , "updated_at": "2016-11-29T20:36:48.016Z"
+                                    , "created_at": 1670632950
+                                    , "latest_temperature": null
+                                    , "latest_measurement_at": null
                                     , "blergh": "blubh"
                                     }
                                     """
@@ -117,8 +118,9 @@ suite =
                                     , "latitude": 1.00
                                     , "longitude": 2.00
                                     , "sponsor_id": null
-                                    , "created_at": "2016-11-29T20:35:21.813Z"
-                                    , "updated_at": "2016-11-29T20:36:48.016Z"
+                                    , "created_at": 1670632950
+                                    , "latest_temperature": null
+                                    , "latest_measurement_at": null
                                     , "blergh": "blubh"
                                     }
                                     """

@@ -109,8 +109,25 @@ update msg model =
             ( Models.addErrorAlert model alertMsg, Cmd.none )
 
         SensorsLoaded (Ok sensors) ->
-            ( { model | selectedSensor = Nothing, sensors = sensors }
-            , List.map Api.toJsSensor sensors
+            -- Filter sensors, exclude sensors that haven't sent any measurements in more than 7 days
+            let
+                maxMeasurementAgeMillis =
+                    7 * 24 * 60 * 60 * 1000
+
+                filteredSensors =
+                    List.filter
+                        (\sensor ->
+                            case ( model.now, sensor.latestMeasurementAt ) of
+                                ( Just now, Just latestMeasurementAt ) ->
+                                    (Time.posixToMillis now - Time.posixToMillis latestMeasurementAt) < maxMeasurementAgeMillis
+
+                                _ ->
+                                    False
+                        )
+                        sensors
+            in
+            ( { model | selectedSensor = Nothing, sensors = filteredSensors }
+            , List.map Api.toJsSensor filteredSensors
                 |> MapPort.sensorsLoaded
             )
 
@@ -228,5 +245,5 @@ subscriptions model =
         , MapPort.mapInitializationFailed MapInitializationFailed
         , MapPort.mapMoved MapDragged
         , MapPort.sensorClicked SensorClicked
-        , Time.every (10 * 1000) TimeUpdate
+        , Time.every (10 * 1000) TimeUpdate -- Update current time every 10 seconds
         ]

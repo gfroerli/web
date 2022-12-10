@@ -104,8 +104,8 @@ const initializeMap = (pos) => {
             const el = document.createElement('div');
             el.className = 'marker';
             let text;
-            if (sensor.lastMeasurement) {
-                const tempString = sensor.lastMeasurement.temperature;
+            if (sensor.latestTemperature) {
+                const tempString = sensor.latestTemperature;
                 const tempFloat = parseFloat(tempString);
                 if (!!tempFloat) {
                     text = document.createTextNode(Math.round(tempFloat));
