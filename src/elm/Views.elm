@@ -5,11 +5,11 @@ import Charts exposing (temperatureChart)
 import Css exposing (..)
 import Css.Global as Global
 import Dict
-import Helpers exposing (formatTemperature)
+import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
 import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css, href, id, src)
 import Messages exposing (..)
-import Models exposing (Alert, DelayedSensorDetails(..), Model, Sensor, SensorDetails, Severity(..), Sponsor)
+import Models exposing (Alert, DelayedSensorDetails(..), Model, SensorDetails, Severity(..), Sponsor)
 import Routing exposing (Route(..))
 import Time
 
@@ -328,6 +328,12 @@ sidebarContents model =
 
 sensorDescription : Time.Posix -> SensorDetails -> Maybe Sponsor -> Html Msg
 sensorDescription now sensor sponsor =
+    let
+        lastMeasurementTimeAgo =
+            Maybe.map
+                (\latestMeasurementAt -> posixTimeDeltaSeconds latestMeasurementAt now |> approximateTimeAgo)
+                sensor.latestMeasurementAt
+    in
     div []
         [ Maybe.withDefault
             -- Fallback if there is no caption
@@ -344,7 +350,14 @@ sensorDescription now sensor sponsor =
                 )
                 sensor.caption
             )
-        , h3 [] [ text "Letzte Messung" ]
+        , h3 []
+            [ case lastMeasurementTimeAgo of
+                Just timeAgo ->
+                    text <| "Letzte Messung (" ++ timeAgo ++ ")"
+
+                Nothing ->
+                    text "Letzte Messung"
+            ]
         , Maybe.withDefault
             -- Fallback if there is no measurement
             (p
