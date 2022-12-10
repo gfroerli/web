@@ -81,33 +81,28 @@ chartConfig range tickCount =
     }
 
 
-temperatureChart : Maybe Posix -> List Measurement -> Html msg
+temperatureChart : Posix -> List Measurement -> Html msg
 temperatureChart now measurements =
     let
         -- 1h offset / padding
-        paddingMs =
+        paddingMillis =
             1 * 1000 * 3600
 
-        range =
-            case now of
-                Just n ->
-                    Range.window
-                        ((n |> posixToMillis |> toFloat) - (1000 * 3600 * 24 * 3) - paddingMs)
-                        ((n |> posixToMillis |> toFloat) + paddingMs)
+        nowMillis =
+            now |> posixToMillis
 
-                Nothing ->
-                    Range.padded 20 20
+        range =
+            Range.window
+                ((nowMillis |> toFloat) - (1000 * 3600 * 24 * 3) - paddingMillis)
+                ((nowMillis |> toFloat) + paddingMillis)
 
         -- We want to determine the number of ticks to show on the x axis
         -- depending on the amount of available data.
         -- Scale the number of ticks to ensure that the values are still readable.
         tickCount =
-            case ( now, List.head measurements ) of
-                ( Just n, Just measurement ) ->
+            case List.head measurements of
+                Just measurement ->
                     let
-                        nowMillis =
-                            n |> posixToMillis
-
                         createdMillis =
                             measurement.createdAt |> posixToMillis
 
@@ -129,7 +124,7 @@ temperatureChart now measurements =
                     else
                         1
 
-                _ ->
+                Nothing ->
                     0
     in
     LineChart.viewCustom

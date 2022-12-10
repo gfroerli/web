@@ -299,20 +299,25 @@ sidebarContents model =
         headingStyle =
             [ css [ marginBottom (em 0.5) ] ]
     in
-    case model.selectedSensor of
-        Missing ->
+    case ( model.selectedSensor, model.now ) of
+        ( Missing, _ ) ->
             [ h2 headingStyle [ text "Details" ]
             , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
             ]
 
-        Loading ->
+        ( Loading, _ ) ->
             [ h2 headingStyle [ text "Details" ]
             , p [] [ text "Sensor wird geladen..." ]
             ]
 
-        Loaded sensor ->
+        ( Loaded sensor, Nothing ) ->
+            [ h2 headingStyle [ text "Details" ]
+            , p [] [ text "Aktuelle Uhrzeit wird geladen..." ]
+            ]
+
+        ( Loaded sensor, Just now ) ->
             [ h2 headingStyle [ text sensor.deviceName ]
-            , sensorDescription model.now
+            , sensorDescription now
                 sensor
                 (Maybe.andThen
                     (\sponsorId -> Dict.get sponsorId model.sponsors)
@@ -321,7 +326,7 @@ sidebarContents model =
             ]
 
 
-sensorDescription : Maybe Time.Posix -> SensorDetails -> Maybe Sponsor -> Html Msg
+sensorDescription : Time.Posix -> SensorDetails -> Maybe Sponsor -> Html Msg
 sensorDescription now sensor sponsor =
     div []
         [ Maybe.withDefault
