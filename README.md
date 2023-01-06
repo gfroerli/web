@@ -1,4 +1,4 @@
-# Water Sensor Web
+# gfrör.li Webapp
 
 [![CI][ci-badge]][ci]
 
