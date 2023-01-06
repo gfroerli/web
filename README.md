@@ -57,7 +57,8 @@ is done in `src/static/index.js`, and bridged to Elm using the [port
 system](https://guide.elm-lang.org/interop/javascript.html).
 
 Contributions are welcome. If you need any guidance, feel free to create an
-issue on Github or join our IRC channel #coredump on Freenode!
+issue on Github or [join our Mattermost channel ~gfrorli on
+chat.coredump.ch](https://chat.coredump.ch/coredump/channels/gfrorli)!
 
 Before committing, make sure to reformat your code with elm-format. You can do
 so using your IDE, or with `make format`.
