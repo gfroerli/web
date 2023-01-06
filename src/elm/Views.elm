@@ -90,6 +90,10 @@ page subtitle alerts elements =
                 -- Media queries: Avoid download buttons overlapping with header
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.body [ paddingTop (px 50) ] ]
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 350) ] ] [ Global.body [ paddingTop (px 100) ] ]
+
+                -- Media queries: Make sidebar larger on small devices
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 1600) ] ] [ Global.id "sidebar" [ flexBasis (pct 30) ] ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.id "sidebar" [ flexBasis (pct 50) ] ]
                 ]
             , div [ css [ width (pct 100), marginTop (px 16) ] ]
                 [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
