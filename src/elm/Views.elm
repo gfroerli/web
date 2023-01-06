@@ -88,12 +88,26 @@ page subtitle alerts elements =
                     ]
 
                 -- Media queries: Avoid download buttons overlapping with header
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.body [ paddingTop (px 50) ] ]
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 350) ] ] [ Global.body [ paddingTop (px 100) ] ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ]
+                    [ Global.id "download-buttons"
+                        [ position static
+                        , margin2 zero auto
+                        , marginBottom (px 16)
+                        ]
+                    ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ]
+                    [ Global.selector "#download-buttons img"
+                        [ height (px 40)
+                        ]
+                    ]
 
                 -- Media queries: Make sidebar larger on small devices
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 1600) ] ] [ Global.id "sidebar" [ flexBasis (pct 30) ] ]
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.id "sidebar" [ flexBasis (pct 50) ] ]
+
+                -- Media queries: Reduce title size on small devices
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h1 [ fontSize (em 2), marginBottom (px 8) ] ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h2 [ fontSize (em 1.3), marginBottom (px 8) ] ]
                 ]
             , div [ css [ width (pct 100), marginTop (px 16) ] ]
                 [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
@@ -242,7 +256,7 @@ mapView model =
             ++ " in verschiedenen Seen der Schweiz!"
         )
         model.alerts
-        [ div [ css [ position absolute, top (px 8), right (px 8) ] ]
+        [ div [ id "download-buttons", css [ position absolute, top (px 8), right (px 8) ] ]
             [ a
                 [ href "https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh" ]
                 [ img [ src "/static/google-play-badge.png" ] [] ]
