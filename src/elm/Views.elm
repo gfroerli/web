@@ -4,6 +4,7 @@ import Browser
 import Charts exposing (temperatureChart)
 import Css exposing (..)
 import Css.Global as Global
+import Css.Media as Media
 import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
 import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (alt, css, href, id, src)
@@ -55,15 +56,22 @@ page subtitle alerts elements =
         ]
         (List.append
             [ Global.global
-                [ Global.body <| fontBody ++ [ fontSize (px 16) ]
-                , Global.id "main" [ minHeight (vh 100) ]
+                [ -- Layout
+                  Global.id "main" [ minHeight (vh 100) ]
+
+                -- Typography
+                , Global.body <| fontBody ++ [ fontSize (px 16) ]
                 , Global.h1 <| fontHeading ++ [ fontSize (em 3.4), marginBottom (px 16) ]
                 , Global.h2 <| fontHeading ++ [ fontSize (em 2.2), marginBottom (px 8) ]
                 , Global.h3 <| fontHeading ++ [ fontSize (em 1.6), marginBottom (px 8), marginTop (px 32) ]
                 , Global.h4 <| fontHeading ++ [ fontSize (em 1.3) ]
                 , Global.p [ lineHeight (em 1.5), marginBottom (px 8) ]
                 , Global.strong [ fontWeight bold ]
+
+                -- Lists
                 , Global.li [ listStyleType disc, listStylePosition inside ]
+
+                -- Map markers
                 , Global.class "marker"
                     [ backgroundImage (url "/static/marker.svg")
                     , backgroundSize cover
@@ -78,6 +86,10 @@ page subtitle alerts elements =
                     , Global.withClass "selected"
                         [ backgroundImage (url "/static/marker-selected.svg") ]
                     ]
+
+                -- Media queries: Avoid download buttons overlapping with header
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.body [ paddingTop (px 50) ] ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 350) ] ] [ Global.body [ paddingTop (px 100) ] ]
                 ]
             , div [ css [ width (pct 100), marginTop (px 16) ] ]
                 [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
