@@ -108,15 +108,14 @@ page subtitle alerts elements =
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.id "wrapper" [ flexDirection column ] ]
 
                 -- Media queries: Reduce title size on small devices
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h1 [ fontSize (em 2), marginBottom (px 8) ] ]
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h2 [ fontSize (em 1.3), marginBottom (px 8) ] ]
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h3 [ fontSize (em 1.1), marginBottom (px 8) ] ]
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ]
-                    [ Global.id "subtitle"
-                        [ fontSize (em 0.9)
-                        , lineHeight (em 1.1)
-                        , marginTop (px 8)
-                        ]
+                , Global.media
+                    [ Media.only Media.screen [ Media.maxWidth (px 500) ]
+                    , Media.only Media.screen [ Media.maxHeight (px 500) ]
+                    ]
+                    [ Global.h1 [ fontSize (em 2), marginBottom (px 8) ]
+                    , Global.h2 [ fontSize (em 1.3), marginBottom (px 8) ]
+                    , Global.h3 [ fontSize (em 1.1), marginBottom (px 8) ]
+                    , Global.id "subtitle" [ display none ]
                     ]
 
                 -- Media queries: Allow scrolling on screens with low height
