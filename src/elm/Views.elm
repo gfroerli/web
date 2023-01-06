@@ -48,7 +48,8 @@ view model =
 page : String -> List Alert -> List (Html Msg) -> Html Msg
 page subtitle alerts elements =
     div
-        [ css
+        [ id "page"
+        , css
             [ height (vh 100)
             , displayFlex
             , flexDirection column
@@ -101,19 +102,34 @@ page subtitle alerts elements =
                         ]
                     ]
 
-                -- Media queries: Make sidebar larger on small devices
+                -- Media queries: Make sidebar larger on small devices and put it below map
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 1600) ] ] [ Global.id "sidebar" [ flexBasis (pct 30) ] ]
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.id "sidebar" [ flexBasis (pct 50) ] ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.id "wrapper" [ flexDirection column ] ]
 
-                -- Media queries: Reduce title size on small devices
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h1 [ fontSize (em 2), marginBottom (px 8) ] ]
-                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h2 [ fontSize (em 1.3), marginBottom (px 8) ] ]
+                -- Media queries: Reduce title and text size on small devices
+                , Global.media
+                    [ Media.only Media.screen [ Media.maxWidth (px 500) ]
+                    , Media.only Media.screen [ Media.maxHeight (px 500) ]
+                    ]
+                    [ Global.body [ fontSize (em 0.9) ]
+                    , Global.h1 [ fontSize (em 2), marginBottom (px 8) ]
+                    , Global.h2 [ fontSize (em 1.3), marginBottom (px 8) ]
+                    , Global.h3 [ fontSize (em 1.1), marginBottom (px 8) ]
+                    , Global.id "subtitle" [ display none ]
+                    ]
+
+                -- Media queries: Allow scrolling on screens with low height
+                , Global.media [ Media.only Media.screen [ Media.maxHeight (px 500) ] ] [ Global.id "page" [ height (px 600) ] ]
                 ]
             , div [ css [ width (pct 100), marginTop (px 16) ] ]
                 [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
                 , h2 [ css [ textAlign center ] ] [ text "Wassertemperaturen Schweiz" ]
                 ]
-            , p [ css [ textAlign center, margin2 (px 16) zero ] ]
+            , p
+                [ id "subtitle"
+                , css [ textAlign center, margin2 (px 16) zero ]
+                ]
                 [ text subtitle ]
             , alertMessages alerts
             ]
@@ -176,7 +192,7 @@ aboutView =
         ""
         []
         [ div
-            [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
+            [ css [ maxWidth (px 800), paddingLeft (px 8), paddingRight (px 8), margin2 zero auto, textAlign center ] ]
             [ h2 [] [ text "About" ]
             , h3 [ css [] ] [ text "Warum dieses Projekt?" ]
             , p [] [ text "Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es keine verlässliche Methode, um Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten." ]
@@ -212,7 +228,7 @@ privacyPolicyView =
         ""
         []
         [ div
-            [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
+            [ css [ maxWidth (px 800), paddingLeft (px 8), paddingRight (px 8), margin2 zero auto, textAlign center ] ]
             [ h2 [] [ text "Privacy Policy (Apps / Web)" ]
             , p [] [ text "Verein Coredump built the Gfrörli apps and website as Open Source apps and website. This service is provided by Verein Coredump at no cost and is intended for use as is." ]
             , p [] [ text "This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information if anyone decided to use our Service." ]
@@ -453,7 +469,7 @@ sensorDescription now sensor sponsor =
             Models.SponsorLoaded sp ->
                 let
                     intro =
-                        p [] [ text <| "Dieser Sponsor wird von \"" ++ sp.name ++ "\" gesponsert." ]
+                        p [] [ text <| "Dieser Sensor wird von \"" ++ sp.name ++ "\" gesponsert." ]
 
                     logo =
                         Maybe.map
