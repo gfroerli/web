@@ -4,14 +4,13 @@ import Browser
 import Charts exposing (temperatureChart)
 import Css exposing (..)
 import Css.Global as Global
-import Dict
 import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
-import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, styled, text, toUnstyled, ul)
+import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css, href, id, src)
 import Material.Icons.Outlined as Outlined
 import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
-import Models exposing (Alert, DelayedSensorDetails(..), Model, SensorDetails, Severity(..), Sponsor)
+import Models exposing (Alert, DelayedSponsor, Model, SensorDetails, Severity(..))
 import Routing exposing (Route(..))
 import Time
 
@@ -302,33 +301,30 @@ sidebarContents model =
             [ css [ marginBottom (em 0.5) ] ]
     in
     case ( model.selectedSensor, model.now ) of
-        ( Missing, _ ) ->
+        ( Models.SensorMissing, _ ) ->
             [ h2 headingStyle [ text "Details" ]
             , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
             ]
 
-        ( Loading, _ ) ->
+        ( Models.SensorLoading, _ ) ->
             [ h2 headingStyle [ text "Details" ]
             , p [] [ text "Sensor wird geladen..." ]
             ]
 
-        ( Loaded sensor, Nothing ) ->
+        ( Models.SensorLoaded _, Nothing ) ->
             [ h2 headingStyle [ text "Details" ]
             , p [] [ text "Aktuelle Uhrzeit wird geladen..." ]
             ]
 
-        ( Loaded sensor, Just now ) ->
+        ( Models.SensorLoaded sensor, Just now ) ->
             [ h2 headingStyle [ text sensor.deviceName ]
             , sensorDescription now
                 sensor
-                (Maybe.andThen
-                    (\sponsorId -> Dict.get sponsorId model.sponsors)
-                    sensor.sponsorId
-                )
+                model.selectedSponsor
             ]
 
 
-sensorDescription : Time.Posix -> SensorDetails -> Maybe Sponsor -> Html Msg
+sensorDescription : Time.Posix -> SensorDetails -> DelayedSponsor -> Html Msg
 sensorDescription now sensor sponsor =
     let
         lastMeasurementTimeAgo =
@@ -410,21 +406,21 @@ sensorDescription now sensor sponsor =
             _ ->
                 p [ css [ fontStyle italic ] ] [ text "Keine Statistiken vorhanden" ]
         , h3 [] [ text "Sponsor" ]
-        , Maybe.withDefault
-            (p
-                [ css [ fontStyle italic ] ]
-                [ text "Sponsor wird geladen..." ]
-            )
-            (Maybe.map
-                (\sp ->
-                    div [] <|
-                        p
-                            [ css [ fontStyle italic ] ]
-                            [ text sp.name ]
-                            :: splitParagraphs sp.description
-                )
-                sponsor
-            )
+        , case sponsor of
+            Models.SponsorMissing ->
+                p [ css [ fontStyle italic ] ] [ text "Kein Sponsor gefunden" ]
+
+            Models.SponsorLoading ->
+                p
+                    [ css [ fontStyle italic ] ]
+                    [ text "Sponsor wird geladen..." ]
+
+            Models.SponsorLoaded sp ->
+                div [] <|
+                    p
+                        [ css [ fontStyle italic ] ]
+                        [ text sp.name ]
+                        :: splitParagraphs sp.description
         ]
 
 

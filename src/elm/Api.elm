@@ -82,9 +82,10 @@ sensorDetailsDecoder =
 sponsorDecoder : Decode.Decoder Sponsor
 sponsorDecoder =
     Decode.succeed Sponsor
+        |> Pipeline.required "id" Decode.int
         |> Pipeline.required "name" Decode.string
         |> Pipeline.optional "description" Decode.string ""
-        |> Pipeline.optional "active" Decode.bool False
+        |> Pipeline.required "logo_url" (Decode.nullable Decode.string)
 
 
 measurementDecoder : Decode.Decoder Measurement
@@ -193,13 +194,13 @@ loadSensorMeasurements apiToken now sensorId secondsAgo =
 
 
 loadSponsor : String -> Int -> Cmd Msg
-loadSponsor apiToken sponsorId =
+loadSponsor apiToken sensorId =
     let
         url =
-            getUrl "sponsors/" ++ String.fromInt sponsorId
+            getUrl "mobile_app/sensors/" ++ String.fromInt sensorId ++ "/sponsor"
 
         handler =
-            \res -> SponsorLoaded ( sponsorId, res )
+            \res -> SponsorLoaded res
     in
     Http.request
         { method = "GET"
