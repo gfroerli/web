@@ -1,6 +1,7 @@
 module Models exposing
     ( Alert
     , DelayedSensorDetails(..)
+    , DelayedSponsor(..)
     , JsSensor
     , Measurement
     , Model
@@ -12,7 +13,6 @@ module Models exposing
     )
 
 import Browser.Navigation as Nav
-import Dict exposing (Dict)
 import Map
 import Routing exposing (Route)
 import Time
@@ -29,9 +29,15 @@ type alias Alert =
 
 
 type DelayedSensorDetails
-    = Loaded SensorDetails
-    | Loading
-    | Missing
+    = SensorLoaded SensorDetails
+    | SensorLoading
+    | SensorMissing
+
+
+type DelayedSponsor
+    = SponsorLoaded Sponsor
+    | SponsorLoading
+    | SponsorMissing
 
 
 {-| Add an error alert message to the model.
@@ -53,7 +59,7 @@ type alias Model =
     , map : Map.Model
     , sensors : List Sensor
     , selectedSensor : DelayedSensorDetails
-    , sponsors : Dict Int Sponsor
+    , selectedSponsor : DelayedSponsor
     , apiToken : String
     , now : Maybe Time.Posix
     , alerts : List Alert
@@ -92,9 +98,10 @@ type alias SensorDetails =
 
 
 type alias Sponsor =
-    { name : String
+    { id : Int
+    , name : String
     , description : String
-    , active : Bool
+    , logo_url : Maybe String
     }
 
 

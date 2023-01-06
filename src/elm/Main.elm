@@ -3,12 +3,10 @@ module Main exposing (Flags, init, main, subscriptions, update)
 import Api
 import Browser
 import Browser.Navigation as Nav
-import Dict
-import List.Extra exposing (find)
 import Map
 import MapPort
 import Messages exposing (..)
-import Models exposing (DelayedSensorDetails(..), Model)
+import Models exposing (Model)
 import Routing exposing (toRoute)
 import Task
 import Time exposing (posixToMillis)
@@ -50,8 +48,8 @@ init flags url key =
       , route = currentRoute
       , map = map
       , sensors = []
-      , selectedSensor = Missing
-      , sponsors = Dict.empty
+      , selectedSensor = Models.SensorMissing
+      , selectedSponsor = Models.SponsorMissing
       , apiToken = flags.apiToken
       , now = Nothing
       , alerts = []
@@ -128,7 +126,7 @@ update msg model =
                         )
                         sensors
             in
-            ( { model | selectedSensor = Missing, sensors = filteredSensors }
+            ( { model | selectedSensor = Models.SensorMissing, sensors = filteredSensors }
             , List.map Api.toJsSensor filteredSensors
                 |> MapPort.sensorsLoaded
             )
@@ -155,7 +153,7 @@ update msg model =
                         _ ->
                             Cmd.none
             in
-            ( { model | selectedSensor = Loaded sensorDetails }, cmdMeasurements )
+            ( { model | selectedSensor = Models.SensorLoaded sensorDetails }, cmdMeasurements )
 
         SensorDetailsLoaded (Err error) ->
             let
@@ -164,19 +162,13 @@ update msg model =
             in
             ( Models.addErrorAlert model alertMsg, Cmd.none )
 
-        SponsorLoaded ( sponsorId, Ok sponsor ) ->
-            let
-                updatedSponsors =
-                    Dict.insert sponsorId sponsor model.sponsors
-            in
-            ( { model | sponsors = updatedSponsors }, Cmd.none )
+        SponsorLoaded (Ok sponsor) ->
+            ( { model | selectedSponsor = Models.SponsorLoaded sponsor }, Cmd.none )
 
-        SponsorLoaded ( sponsorId, Err error ) ->
+        SponsorLoaded (Err error) ->
             let
                 alertMsg =
-                    "Sponsor-Daten für Sponsor "
-                        ++ String.fromInt sponsorId
-                        ++ " konnten nicht geladen werden: "
+                    "Sponsor-Daten für Sensor  konnten nicht geladen werden: "
                         ++ Api.errorToString error
             in
             ( Models.addErrorAlert model alertMsg, Cmd.none )
@@ -187,13 +179,13 @@ update msg model =
                 -- measurements matches its id.
                 sensor =
                     case model.selectedSensor of
-                        Missing ->
+                        Models.SensorMissing ->
                             Nothing
 
-                        Loading ->
+                        Models.SensorLoading ->
                             Nothing
 
-                        Loaded sensorDetails ->
+                        Models.SensorLoaded sensorDetails ->
                             if sensorDetails.id == sensorId then
                                 Just sensorDetails
 
@@ -211,7 +203,7 @@ update msg model =
                                 updatedSensor =
                                     { s | historicMeasurements = Just sortedMeasurements }
                             in
-                            { model | selectedSensor = Loaded updatedSensor }
+                            { model | selectedSensor = Models.SensorLoaded updatedSensor }
 
                         Nothing ->
                             model
@@ -244,34 +236,25 @@ update msg model =
 
         SensorClicked (Just jsSensor) ->
             let
-                selectedSensor =
-                    find (\sensor -> sensor.id == jsSensor.id)
-                        model.sensors
-
                 -- Trigger loading of sensor details
                 cmdSensorDetails =
                     Api.loadSensorDetails model.apiToken jsSensor.id
 
-                -- If not yet present, trigger loading of sponsor
+                -- Trigger loading of sponsor information
                 cmdSponsor =
-                    case Maybe.map .sponsorId selectedSensor of
-                        Just (Just sponsorId) ->
-                            Api.loadSponsor model.apiToken sponsorId
-
-                        _ ->
-                            Cmd.none
+                    Api.loadSponsor model.apiToken jsSensor.id
 
                 cmd =
                     Cmd.batch [ cmdSensorDetails, cmdSponsor ]
             in
-            ( { model | selectedSensor = Loading }, cmd )
+            ( { model | selectedSensor = Models.SensorLoading }, cmd )
 
         SensorClicked Nothing ->
-            ( { model | selectedSensor = Missing }, Cmd.none )
+            ( { model | selectedSensor = Models.SensorMissing }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ MapPort.mapInitialized MapInitialized
         , MapPort.mapInitializationFailed MapInitializationFailed

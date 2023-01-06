@@ -1,6 +1,6 @@
 module Charts exposing (temperatureChart)
 
-import Html exposing (Html, p, text)
+import Html exposing (Html)
 import LineChart exposing (Config)
 import LineChart.Area as Area
 import LineChart.Axis as Axis
@@ -20,10 +20,6 @@ import LineChart.Legends as Legends
 import LineChart.Line as Line
 import Models exposing (Measurement)
 import Time exposing (Posix, posixToMillis, utc)
-
-
-type alias Point =
-    { x : Float, y : Float }
 
 
 chartConfig : Range.Config -> Int -> Config Measurement msg
