@@ -1,0 +1,40 @@
+on: [push]
+
+name: CI
+
+env:
+  API_TOKEN: 'asdfjklo'
+
+jobs:
+
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: make setup
+      - name: Build project
+        run: npx elm make src/elm/Main.elm && rm index.html
+      - name: Build dist
+        run: make dist
+      - name: Run tests
+        run: make test
+      - name: Validate formatting
+        run: npx elm-format --validate src/
+
+  formatting:
+    name: Validate formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: make setup
+      - name: Validate formatting
+        run: npx elm-format --validate src/
