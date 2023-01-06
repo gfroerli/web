@@ -101,9 +101,10 @@ page subtitle alerts elements =
                         ]
                     ]
 
-                -- Media queries: Make sidebar larger on small devices
+                -- Media queries: Make sidebar larger on small devices and put it below map
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 1600) ] ] [ Global.id "sidebar" [ flexBasis (pct 30) ] ]
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.id "sidebar" [ flexBasis (pct 50) ] ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 900) ] ] [ Global.id "wrapper" [ flexDirection column ] ]
 
                 -- Media queries: Reduce title size on small devices
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h1 [ fontSize (em 2), marginBottom (px 8) ] ]
