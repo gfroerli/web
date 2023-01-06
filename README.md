@@ -72,4 +72,4 @@ Licensed under the AGPLv3 or later, see `LICENSE.md`.
 
 <!-- Badges -->
 [ci]: https://github.com/gfroerli/web/actions?query=workflow%3ACI
-[ci-badge]: https://img.shields.io/github/actions/workflow/status/gfroerli/web/ci.yml?branch=master
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/gfroerli/web/ci.yml?branch=main
