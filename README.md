@@ -1,6 +1,6 @@
 # Water Sensor Web
 
-[![CircleCI][circle-ci-badge]][circle-ci]
+[![CI][ci-badge]][ci]
 
 Web application for the water sensor API, written in
 [Elm](http://elm-lang.org/).
@@ -70,5 +70,5 @@ Licensed under the AGPLv3 or later, see `LICENSE.md`.
 
 
 <!-- Badges -->
-[circle-ci]: https://circleci.com/gh/gfroerli/web/tree/master
-[circle-ci-badge]: https://circleci.com/gh/gfroerli/web/tree/master.svg?style=shield
+[ci]: https://github.com/gfroerli/web/actions?query=workflow%3ACI
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/gfroerli/web/ci.yml?branch=master
