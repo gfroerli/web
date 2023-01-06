@@ -6,7 +6,7 @@ import Css exposing (..)
 import Css.Global as Global
 import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
 import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
-import Html.Styled.Attributes exposing (css, href, id, src)
+import Html.Styled.Attributes exposing (alt, css, href, id, src)
 import Material.Icons.Outlined as Outlined
 import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
@@ -405,7 +405,12 @@ sensorDescription now sensor sponsor =
 
             _ ->
                 p [ css [ fontStyle italic ] ] [ text "Keine Statistiken vorhanden" ]
-        , h3 [] [ text "Sponsor" ]
+        , case sponsor of
+            Models.SponsorLoaded sp ->
+                h3 [] [ text <| "Sponsor: " ++ sp.name ]
+
+            _ ->
+                h3 [] [ text "Sponsor" ]
         , case sponsor of
             Models.SponsorMissing ->
                 p [ css [ fontStyle italic ] ] [ text "Kein Sponsor gefunden" ]
@@ -416,11 +421,28 @@ sensorDescription now sensor sponsor =
                     [ text "Sponsor wird geladen..." ]
 
             Models.SponsorLoaded sp ->
-                div [] <|
-                    p
-                        [ css [ fontStyle italic ] ]
-                        [ text sp.name ]
-                        :: splitParagraphs sp.description
+                let
+                    intro =
+                        p [] [ text <| "Dieser Sponsor wird von \"" ++ sp.name ++ "\" gesponsert." ]
+
+                    logo =
+                        Maybe.map
+                            (\url ->
+                                img
+                                    [ src url
+                                    , alt (sp.name ++ " Logo")
+                                    , css [ width (pct 70), marginTop (px 16), marginBottom (px 24), marginLeft (px 24) ]
+                                    ]
+                                    []
+                            )
+                            sp.logo_url
+                in
+                div [ css [ displayFlex, flexDirection column ] ] <|
+                    List.append
+                        -- Intro and logo
+                        (List.filterMap (\x -> x) [ Just intro, logo ])
+                        -- Description paragraph(s)
+                        (splitParagraphs sp.description)
         ]
 
 
