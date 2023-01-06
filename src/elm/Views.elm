@@ -108,6 +108,7 @@ page subtitle alerts elements =
                 -- Media queries: Reduce title size on small devices
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h1 [ fontSize (em 2), marginBottom (px 8) ] ]
                 , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h2 [ fontSize (em 1.3), marginBottom (px 8) ] ]
+                , Global.media [ Media.only Media.screen [ Media.maxWidth (px 500) ] ] [ Global.h3 [ fontSize (em 1.1), marginBottom (px 8) ] ]
                 ]
             , div [ css [ width (pct 100), marginTop (px 16) ] ]
                 [ h1 [ css [ textAlign center, marginBottom (px 4) ] ] [ text "Gfrör.li" ]
@@ -176,7 +177,7 @@ aboutView =
         ""
         []
         [ div
-            [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
+            [ css [ maxWidth (px 800), paddingLeft (px 8), paddingRight (px 8), margin2 zero auto, textAlign center ] ]
             [ h2 [] [ text "About" ]
             , h3 [ css [] ] [ text "Warum dieses Projekt?" ]
             , p [] [ text "Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es keine verlässliche Methode, um Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten." ]
@@ -212,7 +213,7 @@ privacyPolicyView =
         ""
         []
         [ div
-            [ css [ width (px 800), margin2 zero auto, textAlign center ] ]
+            [ css [ maxWidth (px 800), paddingLeft (px 8), paddingRight (px 8), margin2 zero auto, textAlign center ] ]
             [ h2 [] [ text "Privacy Policy (Apps / Web)" ]
             , p [] [ text "Verein Coredump built the Gfrörli apps and website as Open Source apps and website. This service is provided by Verein Coredump at no cost and is intended for use as is." ]
             , p [] [ text "This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information if anyone decided to use our Service." ]
