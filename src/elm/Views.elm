@@ -468,7 +468,7 @@ sensorDescription now sensor sponsor =
             Models.SponsorLoaded sp ->
                 let
                     intro =
-                        p [] [ text <| "Dieser Sponsor wird von \"" ++ sp.name ++ "\" gesponsert." ]
+                        p [] [ text <| "Dieser Sensor wird von \"" ++ sp.name ++ "\" gesponsert." ]
 
                     logo =
                         Maybe.map
