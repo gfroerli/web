@@ -13,7 +13,7 @@
         "elm-test": "0.19.1-revision11",
         "elm-webpack-loader": "^8",
         "html-webpack-plugin": "^5.5.0",
-        "webpack": "^5.72.1",
+        "webpack": "^5.76.0",
         "webpack-cli": "^5.0.0",
         "webpack-dev-server": "^4.9.0",
         "webpack-merge": "^5.2.0"
