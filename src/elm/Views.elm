@@ -274,8 +274,11 @@ mapView model =
         model.alerts
         [ div [ id "download-buttons", css [ position absolute, top (px 8), right (px 8) ] ]
             [ a
+                [ href "https://github.com/gfroerli/app-android/releases" ]
+                [ img [ src "/static/download-apk-badge.png" ] [] ]
+            , a
                 [ href "https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh" ]
-                [ img [ src "/static/google-play-badge.png" ] [] ]
+                [ img [ src "/static/google-play-badge.png", css [ marginLeft (px 8), height (px 50) ] ] [] ]
             , a
                 [ href "https://apps.apple.com/us/app/gfr%C3%B6r-li/id1451431723" ]
                 [ img [ src "/static/AppStoreBadge.png", css [ marginLeft (px 8), height (px 50) ] ] [] ]
