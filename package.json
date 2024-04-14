@@ -4,7 +4,7 @@
     "version": "0.2.0",
     "private": true,
     "devDependencies": {
-        "copy-webpack-plugin": "^11",
+        "copy-webpack-plugin": "^12",
         "dotenv": "^16",
         "elm": "0.19.1-5",
         "elm-format": "^0.8.5",
