@@ -10,7 +10,7 @@
         "elm-format": "^0.8.5",
         "elm-json": "^0.2.13",
         "elm-outdated": "^1.1.1",
-        "elm-test": "0.19.1-revision11",
+        "elm-test": "0.19.1-revision12",
         "elm-webpack-loader": "^8",
         "html-webpack-plugin": "^5.5.0",
         "webpack": "^5.76.0",
