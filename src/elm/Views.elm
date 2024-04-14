@@ -332,7 +332,7 @@ mapView model =
                 , padding2 (px 8) zero
                 ]
             ]
-            [ text "© 2017–2023 Coredump Rapperswil-Jona"
+            [ text "© 2017–2024 Coredump Rapperswil-Jona"
             , text " | "
             , a [ href Routing.aboutPath ] [ text "About" ]
             , text " | "
