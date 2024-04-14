@@ -125,12 +125,12 @@ apiTimeout =
 
 getUrl : String -> String
 getUrl path =
-    "https://watertemp-api.coredump.ch/api/" ++ path
+    "https://api.gfrör.li/api/" ++ path
 
 
 getAppUrl : String -> String
 getAppUrl path =
-    "https://watertemp-api.coredump.ch/api/mobile_app/" ++ path
+    "https://api.gfrör.li/api/mobile_app/" ++ path
 
 
 loadSensors : String -> Cmd Msg
