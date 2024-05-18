@@ -42,7 +42,7 @@ module.exports = {
             minfy: false,
         }),
         new CopyWebpackPlugin({
-            patterns: [ { from: 'static', to: 'static' } ],
+            patterns: [ { from: 'static', to: 'static' }, { from: '.well-known', to: '.well-known' } ],
         }),
     ],
 
