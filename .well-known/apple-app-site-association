@@ -1,13 +1,17 @@
 {
-  "applinks": {
-    "apps": [],
-    "details": [
-      {
-        "appID": "T7M5358433.ch.coredump.gfroerli",
-        "paths": [
-          "/"
+    "applinks": {
+        "details": [
+            {
+                "appIDs": [
+                    "1451431723.ch.coredump.gfroerli",
+                    "T7M5358433.ch.coredump.gfroerli"
+                ],
+                "components": [
+                    {
+                        "/": "*"
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  }
+    }
 }
