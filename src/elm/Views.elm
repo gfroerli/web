@@ -11,7 +11,7 @@ import Html.Styled.Attributes exposing (alt, css, href, id, src)
 import Material.Icons.Outlined as Outlined
 import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
-import Models exposing (Alert, DelayedSponsor, Model, SensorDetails, Severity(..))
+import Models exposing (Alert, DelayedSensorDetails(..), DelayedSponsor, Model, SensorDetails, Severity(..))
 import Routing exposing (Route(..))
 import Time
 
@@ -41,7 +41,13 @@ view model =
                 NotFoundRoute ->
                     notFoundView
     in
-    { title = "Gfrörli – Wassertemperatur Schweiz"
+    { title =
+        case model.selectedSensor of
+            SensorLoaded details ->
+                "Gfrörli – " ++ details.deviceName ++ " – Wassertemperatur Schweiz"
+
+            _ ->
+                "Gfrörli – Wassertemperatur Schweiz"
     , body = [ toUnstyled body ]
     }
 
