@@ -7,7 +7,7 @@ import Css.Global as Global
 import Css.Media as Media
 import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
 import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
-import Html.Styled.Attributes exposing (alt, css, href, id, src)
+import Html.Styled.Attributes exposing (alt, css, href, id, src, title)
 import Material.Icons.Outlined as Outlined
 import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
@@ -375,7 +375,10 @@ sidebarContents model =
             ]
 
         ( Models.SensorLoaded sensor, Just now ) ->
-            [ h2 headingStyle [ text sensor.deviceName ]
+            [ div [ css [ displayFlex, flexDirection row, justifyContent spaceBetween ] ]
+                [ h2 headingStyle [ text sensor.deviceName ]
+                , a [ href (Routing.sensorPath sensor.id), title "Permalink" ] [ fromUnstyled <| Outlined.link 16 Inherit ]
+                ]
             , sensorDescription now
                 sensor
                 model.selectedSponsor
