@@ -353,7 +353,7 @@ sidebarContents model =
             [ css [ marginBottom (em 0.5) ] ]
     in
     case ( model.selectedSensor, model.now ) of
-        ( Models.SensorMissing, _ ) ->
+        ( Models.NoSensor, _ ) ->
             [ h2 headingStyle [ text "Details" ]
             , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
             ]
@@ -464,7 +464,7 @@ sensorDescription now sensor sponsor =
             _ ->
                 h3 [] [ text "Sponsor" ]
         , case sponsor of
-            Models.SponsorMissing ->
+            Models.NoSponsor ->
                 p [ css [ fontStyle italic ] ] [ text "Kein Sponsor gefunden" ]
 
             Models.SponsorLoading ->

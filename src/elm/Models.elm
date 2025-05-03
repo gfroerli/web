@@ -33,13 +33,13 @@ type alias Alert =
 type DelayedSensorDetails
     = SensorLoaded SensorDetails
     | SensorLoading
-    | SensorMissing
+    | NoSensor
 
 
 type DelayedSponsor
     = SponsorLoaded Sponsor
     | SponsorLoading
-    | SponsorMissing
+    | NoSponsor
 
 
 {-| Add an error alert message to the model.

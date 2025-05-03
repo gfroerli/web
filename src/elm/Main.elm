@@ -55,8 +55,8 @@ init flags url key =
       , map = map
       , sensors = []
       , initialSensorId = initialSensorId
-      , selectedSensor = Models.SensorMissing
-      , selectedSponsor = Models.SponsorMissing
+      , selectedSensor = Models.NoSensor
+      , selectedSponsor = Models.NoSponsor
       , apiToken = flags.apiToken
       , now = Nothing
       , alerts = []
@@ -168,7 +168,7 @@ update msg model =
                             )
 
                         Nothing ->
-                            ( { modelWithSensors | selectedSensor = Models.SensorMissing }, cmdsBase )
+                            ( { modelWithSensors | selectedSensor = Models.NoSensor }, cmdsBase )
             in
             ( finalModel, Cmd.batch cmds )
 
@@ -220,7 +220,7 @@ update msg model =
                 -- measurements matches its id.
                 sensor =
                     case model.selectedSensor of
-                        Models.SensorMissing ->
+                        Models.NoSensor ->
                             Nothing
 
                         Models.SensorLoading ->
@@ -279,7 +279,7 @@ update msg model =
             ( { model | selectedSensor = Models.SensorLoading }, loadSensor model jsSensor )
 
         SensorClicked Nothing ->
-            ( { model | selectedSensor = Models.SensorMissing }, Cmd.none )
+            ( { model | selectedSensor = Models.NoSensor }, Cmd.none )
 
 
 {-| Load sensor and sponsor details for the given sensor.
