@@ -5,6 +5,7 @@ module Routing exposing
     , githubPath
     , mapPath
     , privacyPolicyPath
+    , routeNeedsMap
     , toRoute
     )
 
@@ -31,6 +32,18 @@ routeParser =
 toRoute : Url.Url -> Route
 toRoute url =
     Maybe.withDefault NotFoundRoute (parse routeParser url)
+
+
+{-| Return whether or not this route requires an initialized map.
+-}
+routeNeedsMap : Route -> Bool
+routeNeedsMap route =
+    case route of
+        MapRoute ->
+            True
+
+        _ ->
+            False
 
 
 

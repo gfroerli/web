@@ -7,7 +7,7 @@ import Map
 import MapPort
 import Messages exposing (..)
 import Models exposing (Model)
-import Routing exposing (toRoute)
+import Routing exposing (routeNeedsMap, toRoute)
 import Task
 import Time exposing (posixToMillis)
 import Url
@@ -43,6 +43,9 @@ init flags url key =
 
         currentRoute =
             toRoute url
+
+        currentRouteNeedsMap =
+            routeNeedsMap currentRoute
     in
     ( { key = key
       , route = currentRoute
@@ -55,9 +58,16 @@ init flags url key =
       , alerts = []
       }
     , Cmd.batch
-        [ MapPort.initializeMap map
-        , Task.perform TimeUpdate Time.now
-        ]
+        -- Note: Initialize map only if needed. The TimeUpdate task on the other
+        -- hand is always needed.
+        (if currentRouteNeedsMap then
+            [ MapPort.initializeMap map
+            , Task.perform TimeUpdate Time.now
+            ]
+
+         else
+            [ Task.perform TimeUpdate Time.now ]
+        )
     )
 
 
