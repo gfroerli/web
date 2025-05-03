@@ -101,21 +101,11 @@ update msg model =
 
                 -- Determine any side effects (e.g. map init) caused by the location change
                 cmd =
-                    case newRoute of
-                        Routing.MapRoute ->
-                            MapPort.initializeMap model.map
+                    if not (routeNeedsMap model.route) && routeNeedsMap newRoute then
+                        MapPort.initializeMap model.map
 
-                        Routing.SensorRoute _ ->
-                            MapPort.initializeMap model.map
-
-                        Routing.AboutRoute ->
-                            Cmd.none
-
-                        Routing.PrivacyPolicyRoute ->
-                            Cmd.none
-
-                        Routing.NotFoundRoute ->
-                            Cmd.none
+                    else
+                        Cmd.none
             in
             ( { model | route = newRoute }, cmd )
 
