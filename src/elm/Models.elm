@@ -10,9 +10,11 @@ module Models exposing
     , Severity(..)
     , Sponsor
     , addErrorAlert
+    , findJsSensorWithId
     )
 
 import Browser.Navigation as Nav
+import List.Extra
 import Map
 import Routing exposing (Route)
 import Time
@@ -58,6 +60,7 @@ type alias Model =
     , route : Route
     , map : Map.Model
     , sensors : List Sensor
+    , initialSensorId : Maybe Int
     , selectedSensor : DelayedSensorDetails
     , selectedSponsor : DelayedSponsor
     , apiToken : String
@@ -112,6 +115,13 @@ type alias JsSensor =
     , pos : Map.Pos
     , latestTemperature : Maybe Float
     }
+
+
+{-| Given an (optional) sensor ID, find the corresponding sensor in the list of JS sensors.
+-}
+findJsSensorWithId : Maybe Int -> List JsSensor -> Maybe JsSensor
+findJsSensorWithId maybeId sensors =
+    Maybe.andThen (\id -> List.Extra.find (\sensor -> sensor.id == id) sensors) maybeId
 
 
 type alias Measurement =

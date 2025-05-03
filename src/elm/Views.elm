@@ -29,6 +29,9 @@ view model =
                 MapRoute ->
                     mapView model
 
+                SensorRoute id ->
+                    mapView model
+
                 AboutRoute ->
                     aboutView
 

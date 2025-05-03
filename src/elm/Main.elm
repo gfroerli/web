@@ -46,11 +46,15 @@ init flags url key =
 
         currentRouteNeedsMap =
             routeNeedsMap currentRoute
+
+        initialSensorId =
+            Routing.getSensorId currentRoute
     in
     ( { key = key
       , route = currentRoute
       , map = map
       , sensors = []
+      , initialSensorId = initialSensorId
       , selectedSensor = Models.SensorMissing
       , selectedSponsor = Models.SponsorMissing
       , apiToken = flags.apiToken
@@ -101,6 +105,9 @@ update msg model =
                         Routing.MapRoute ->
                             MapPort.initializeMap model.map
 
+                        Routing.SensorRoute _ ->
+                            MapPort.initializeMap model.map
+
                         Routing.AboutRoute ->
                             Cmd.none
 
@@ -119,11 +126,11 @@ update msg model =
             ( Models.addErrorAlert model alertMsg, Cmd.none )
 
         SensorsLoaded (Ok sensors) ->
-            -- Filter sensors, exclude sensors that haven't sent any measurements in more than 7 days
             let
                 maxMeasurementAgeMillis =
                     7 * 24 * 60 * 60 * 1000
 
+                -- Filter sensors, exclude sensors that haven't sent any measurements in more than 7 days
                 filteredSensors =
                     List.filter
                         (\sensor ->
@@ -135,11 +142,35 @@ update msg model =
                                     False
                         )
                         sensors
+
+                -- Convert filtered sensors to JavaScript compatible objects
+                filteredJsSensors =
+                    List.map Api.toJsSensor filteredSensors
+
+                -- Add sensors to model
+                modelWithSensors =
+                    { model | sensors = filteredSensors }
+
+                -- Commands that will always be executed
+                cmdsBase =
+                    [ MapPort.sensorsLoaded filteredJsSensors ]
+
+                -- Process initial sensor loading
+                ( finalModel, cmds ) =
+                    case Models.findJsSensorWithId model.initialSensorId filteredJsSensors of
+                        Just initialJsSensor ->
+                            -- An initial JS sensor was found. Load it, and update the model.
+                            ( { modelWithSensors
+                                | selectedSensor = Models.SensorLoading
+                                , initialSensorId = Nothing
+                              }
+                            , cmdsBase ++ [ loadSensor modelWithSensors initialJsSensor ]
+                            )
+
+                        Nothing ->
+                            ( { modelWithSensors | selectedSensor = Models.SensorMissing }, cmdsBase )
             in
-            ( { model | selectedSensor = Models.SensorMissing, sensors = filteredSensors }
-            , List.map Api.toJsSensor filteredSensors
-                |> MapPort.sensorsLoaded
-            )
+            ( finalModel, Cmd.batch cmds )
 
         SensorsLoaded (Err error) ->
             let
@@ -245,22 +276,26 @@ update msg model =
             ( { model | map = newMap }, Cmd.none )
 
         SensorClicked (Just jsSensor) ->
-            let
-                -- Trigger loading of sensor details
-                cmdSensorDetails =
-                    Api.loadSensorDetails model.apiToken jsSensor.id
-
-                -- Trigger loading of sponsor information
-                cmdSponsor =
-                    Api.loadSponsor model.apiToken jsSensor.id
-
-                cmd =
-                    Cmd.batch [ cmdSensorDetails, cmdSponsor ]
-            in
-            ( { model | selectedSensor = Models.SensorLoading }, cmd )
+            ( { model | selectedSensor = Models.SensorLoading }, loadSensor model jsSensor )
 
         SensorClicked Nothing ->
             ( { model | selectedSensor = Models.SensorMissing }, Cmd.none )
+
+
+{-| Load sensor and sponsor details for the given sensor.
+-}
+loadSensor : Model -> Models.JsSensor -> Cmd Msg
+loadSensor model jsSensor =
+    let
+        -- Trigger loading of sensor details
+        cmdSensorDetails =
+            Api.loadSensorDetails model.apiToken jsSensor.id
+
+        -- Trigger loading of sponsor information
+        cmdSponsor =
+            Api.loadSponsor model.apiToken jsSensor.id
+    in
+    Cmd.batch [ cmdSensorDetails, cmdSponsor ]
 
 
 subscriptions : Model -> Sub Msg
