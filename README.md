@@ -63,6 +63,16 @@ chat.coredump.ch](https://chat.coredump.ch/coredump/channels/gfrorli)!
 Before committing, make sure to reformat your code with elm-format. You can do
 so using your IDE, or with `make format`.
 
+## Maintenance
+
+Upgrading Elm dependencies can be done using a few helpers installed through npm:
+
+    # List outdated packages
+    npx elm-outdated
+
+    # Upgrade packages
+    npx elm-json upgrade
+
 ## License
 
 Copyright © 2017–2025 Coredump Hackerspace.
