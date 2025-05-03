@@ -266,11 +266,20 @@ update msg model =
             in
             ( { model | map = newMap }, Cmd.none )
 
+        -- Sensor selected
         SensorClicked (Just jsSensor) ->
-            ( { model | selectedSensor = Models.SensorLoading }, loadSensor model jsSensor )
+            ( { model | selectedSensor = Models.SensorLoading }
+            , Cmd.batch
+                [ Nav.pushUrl model.key (Routing.sensorPath jsSensor.id)
+                , loadSensor model jsSensor
+                ]
+            )
 
+        -- Sensor deselected
         SensorClicked Nothing ->
-            ( { model | selectedSensor = Models.NoSensor }, Cmd.none )
+            ( { model | selectedSensor = Models.NoSensor }
+            , Nav.pushUrl model.key Routing.mapPath
+            )
 
 
 {-| Load sensor and sponsor details for the given sensor.
