@@ -39,7 +39,7 @@ module.exports = {
         new webpack.EnvironmentPlugin(["API_TOKEN"]),
         new HtmlWebpackPlugin({
             template: 'src/static/index.html',
-            minfy: false,
+            minify: false,
         }),
         new CopyWebpackPlugin({
             patterns: [ { from: 'static', to: 'static' }, { from: '.well-known', to: '.well-known' } ],

@@ -7,7 +7,7 @@ Web application for the water sensor API, written in
 
 ## Requirements
 
-You need NodeJS 16. Elm will be installed through npm.
+You need NodeJS 22. Elm will be installed through npm.
 
 If you aren't familiar with Elm yet, you should probably read [the
 tutorial](https://guide.elm-lang.org/). When you're done with that,
@@ -63,9 +63,19 @@ chat.coredump.ch](https://chat.coredump.ch/coredump/channels/gfrorli)!
 Before committing, make sure to reformat your code with elm-format. You can do
 so using your IDE, or with `make format`.
 
+## Maintenance
+
+Upgrading Elm dependencies can be done using a few helpers installed through npm:
+
+    # List outdated packages
+    npx elm-outdated
+
+    # Upgrade packages
+    npx elm-json upgrade
+
 ## License
 
-Copyright © 2017–2024 Coredump Hackerspace.
+Copyright © 2017–2025 Coredump Hackerspace.
 
 Licensed under the AGPLv3 or later, see `LICENSE.md`.
 

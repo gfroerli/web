@@ -3,10 +3,9 @@ on: [push]
 name: CI
 
 env:
-  API_TOKEN: 'asdfjklo'
+  API_TOKEN: "asdfjklo"
 
 jobs:
-
   test:
     name: Build and test
     runs-on: ubuntu-latest
@@ -14,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 22
       - name: Install dependencies
         run: make setup
       - name: Build project
