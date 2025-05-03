@@ -18,7 +18,13 @@ import Models
 port initializeMap : Map.Model -> Cmd msg
 
 
-port sensorsLoaded : List Models.JsSensor -> Cmd msg
+{-| Pass sensors to JS.
+
+First parameter: List of all sensors.
+Second parameter: Optional initially selected sensor.
+
+-}
+port sensorsLoaded : ( List Models.JsSensor, Maybe Models.JsSensor ) -> Cmd msg
 
 
 

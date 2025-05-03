@@ -151,12 +151,8 @@ update msg model =
                 modelWithSensors =
                     { model | sensors = filteredSensors }
 
-                -- Commands that will always be executed
-                cmdsBase =
-                    [ MapPort.sensorsLoaded filteredJsSensors ]
-
                 -- Process initial sensor loading
-                ( finalModel, cmds ) =
+                ( finalModel, cmd ) =
                     case Models.findJsSensorWithId model.initialSensorId filteredJsSensors of
                         Just initialJsSensor ->
                             -- An initial JS sensor was found. Load it, and update the model.
@@ -164,13 +160,18 @@ update msg model =
                                 | selectedSensor = Models.SensorLoading
                                 , initialSensorId = Nothing
                               }
-                            , cmdsBase ++ [ loadSensor modelWithSensors initialJsSensor ]
+                            , Cmd.batch
+                                [ MapPort.sensorsLoaded ( filteredJsSensors, Just initialJsSensor )
+                                , loadSensor modelWithSensors initialJsSensor
+                                ]
                             )
 
                         Nothing ->
-                            ( { modelWithSensors | selectedSensor = Models.NoSensor }, cmdsBase )
+                            ( { modelWithSensors | selectedSensor = Models.NoSensor }
+                            , Cmd.batch [ MapPort.sensorsLoaded ( filteredJsSensors, Nothing ) ]
+                            )
             in
-            ( finalModel, Cmd.batch cmds )
+            ( finalModel, cmd )
 
         SensorsLoaded (Err error) ->
             let

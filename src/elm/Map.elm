@@ -10,9 +10,9 @@ type alias Model =
 
 init : Model
 init =
-    { lat = 47.227099
-    , lng = 8.822077
-    , zoom = 12.0
+    { lat = 47.099859
+    , lng = 8.655552
+    , zoom = 10.0
     }
 
 
