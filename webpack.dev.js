@@ -7,6 +7,9 @@ const config = merge(common, {
     devServer: {
         historyApiFallback: true,
     },
+    output: {
+        publicPath: '/',
+    },
 });
 
 module.exports = config;
