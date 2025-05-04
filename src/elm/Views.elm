@@ -7,11 +7,11 @@ import Css.Global as Global
 import Css.Media as Media
 import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
 import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
-import Html.Styled.Attributes exposing (alt, css, href, id, src)
+import Html.Styled.Attributes exposing (alt, css, href, id, src, title)
 import Material.Icons.Outlined as Outlined
 import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
-import Models exposing (Alert, DelayedSponsor, Model, SensorDetails, Severity(..))
+import Models exposing (Alert, DelayedSensorDetails(..), DelayedSponsor, Model, SensorDetails, Severity(..))
 import Routing exposing (Route(..))
 import Time
 
@@ -29,6 +29,9 @@ view model =
                 MapRoute ->
                     mapView model
 
+                SensorRoute id ->
+                    mapView model
+
                 AboutRoute ->
                     aboutView
 
@@ -38,7 +41,13 @@ view model =
                 NotFoundRoute ->
                     notFoundView
     in
-    { title = "Gfrörli – Wassertemperatur Schweiz"
+    { title =
+        case model.selectedSensor of
+            SensorLoaded details ->
+                "Gfrörli – " ++ details.deviceName ++ " – Wassertemperatur Schweiz"
+
+            _ ->
+                "Gfrörli – Wassertemperatur Schweiz"
     , body = [ toUnstyled body ]
     }
 
@@ -350,7 +359,7 @@ sidebarContents model =
             [ css [ marginBottom (em 0.5) ] ]
     in
     case ( model.selectedSensor, model.now ) of
-        ( Models.SensorMissing, _ ) ->
+        ( Models.NoSensor, _ ) ->
             [ h2 headingStyle [ text "Details" ]
             , p [] [ text "Klicke auf einen Sensor, um mehr über ihn zu erfahren." ]
             ]
@@ -366,7 +375,10 @@ sidebarContents model =
             ]
 
         ( Models.SensorLoaded sensor, Just now ) ->
-            [ h2 headingStyle [ text sensor.deviceName ]
+            [ div [ css [ displayFlex, flexDirection row, justifyContent spaceBetween ] ]
+                [ h2 headingStyle [ text sensor.deviceName ]
+                , a [ href (Routing.sensorPath sensor.id), title "Permalink" ] [ fromUnstyled <| Outlined.link 16 Inherit ]
+                ]
             , sensorDescription now
                 sensor
                 model.selectedSponsor
@@ -461,7 +473,7 @@ sensorDescription now sensor sponsor =
             _ ->
                 h3 [] [ text "Sponsor" ]
         , case sponsor of
-            Models.SponsorMissing ->
+            Models.NoSponsor ->
                 p [ css [ fontStyle italic ] ] [ text "Kein Sponsor gefunden" ]
 
             Models.SponsorLoading ->

@@ -7,7 +7,7 @@ import Map
 import MapPort
 import Messages exposing (..)
 import Models exposing (Model)
-import Routing exposing (toRoute)
+import Routing exposing (routeNeedsMap, toRoute)
 import Task
 import Time exposing (posixToMillis)
 import Url
@@ -43,21 +43,35 @@ init flags url key =
 
         currentRoute =
             toRoute url
+
+        currentRouteNeedsMap =
+            routeNeedsMap currentRoute
+
+        initialSensorId =
+            Routing.getSensorId currentRoute
     in
     ( { key = key
       , route = currentRoute
       , map = map
       , sensors = []
-      , selectedSensor = Models.SensorMissing
-      , selectedSponsor = Models.SponsorMissing
+      , initialSensorId = initialSensorId
+      , selectedSensor = Models.NoSensor
+      , selectedSponsor = Models.NoSponsor
       , apiToken = flags.apiToken
       , now = Nothing
       , alerts = []
       }
     , Cmd.batch
-        [ MapPort.initializeMap map
-        , Task.perform TimeUpdate Time.now
-        ]
+        -- Note: Initialize map only if needed. The TimeUpdate task on the other
+        -- hand is always needed.
+        (if currentRouteNeedsMap then
+            [ MapPort.initializeMap map
+            , Task.perform TimeUpdate Time.now
+            ]
+
+         else
+            [ Task.perform TimeUpdate Time.now ]
+        )
     )
 
 
@@ -87,18 +101,11 @@ update msg model =
 
                 -- Determine any side effects (e.g. map init) caused by the location change
                 cmd =
-                    case newRoute of
-                        Routing.MapRoute ->
-                            MapPort.initializeMap model.map
+                    if not (routeNeedsMap model.route) && routeNeedsMap newRoute then
+                        MapPort.initializeMap model.map
 
-                        Routing.AboutRoute ->
-                            Cmd.none
-
-                        Routing.PrivacyPolicyRoute ->
-                            Cmd.none
-
-                        Routing.NotFoundRoute ->
-                            Cmd.none
+                    else
+                        Cmd.none
             in
             ( { model | route = newRoute }, cmd )
 
@@ -109,11 +116,11 @@ update msg model =
             ( Models.addErrorAlert model alertMsg, Cmd.none )
 
         SensorsLoaded (Ok sensors) ->
-            -- Filter sensors, exclude sensors that haven't sent any measurements in more than 7 days
             let
                 maxMeasurementAgeMillis =
                     7 * 24 * 60 * 60 * 1000
 
+                -- Filter sensors, exclude sensors that haven't sent any measurements in more than 7 days
                 filteredSensors =
                     List.filter
                         (\sensor ->
@@ -125,11 +132,36 @@ update msg model =
                                     False
                         )
                         sensors
+
+                -- Convert filtered sensors to JavaScript compatible objects
+                filteredJsSensors =
+                    List.map Api.toJsSensor filteredSensors
+
+                -- Add sensors to model
+                modelWithSensors =
+                    { model | sensors = filteredSensors }
+
+                -- Process initial sensor loading
+                ( finalModel, cmd ) =
+                    case Models.findJsSensorWithId model.initialSensorId filteredJsSensors of
+                        Just initialJsSensor ->
+                            -- An initial JS sensor was found. Load it, and update the model.
+                            ( { modelWithSensors
+                                | selectedSensor = Models.SensorLoading
+                                , initialSensorId = Nothing
+                              }
+                            , Cmd.batch
+                                [ MapPort.sensorsLoaded ( filteredJsSensors, Just initialJsSensor )
+                                , loadSensor modelWithSensors initialJsSensor
+                                ]
+                            )
+
+                        Nothing ->
+                            ( { modelWithSensors | selectedSensor = Models.NoSensor }
+                            , Cmd.batch [ MapPort.sensorsLoaded ( filteredJsSensors, Nothing ) ]
+                            )
             in
-            ( { model | selectedSensor = Models.SensorMissing, sensors = filteredSensors }
-            , List.map Api.toJsSensor filteredSensors
-                |> MapPort.sensorsLoaded
-            )
+            ( finalModel, cmd )
 
         SensorsLoaded (Err error) ->
             let
@@ -179,7 +211,7 @@ update msg model =
                 -- measurements matches its id.
                 sensor =
                     case model.selectedSensor of
-                        Models.SensorMissing ->
+                        Models.NoSensor ->
                             Nothing
 
                         Models.SensorLoading ->
@@ -234,23 +266,36 @@ update msg model =
             in
             ( { model | map = newMap }, Cmd.none )
 
+        -- Sensor selected
         SensorClicked (Just jsSensor) ->
-            let
-                -- Trigger loading of sensor details
-                cmdSensorDetails =
-                    Api.loadSensorDetails model.apiToken jsSensor.id
+            ( { model | selectedSensor = Models.SensorLoading }
+            , Cmd.batch
+                [ Nav.pushUrl model.key (Routing.sensorPath jsSensor.id)
+                , loadSensor model jsSensor
+                ]
+            )
 
-                -- Trigger loading of sponsor information
-                cmdSponsor =
-                    Api.loadSponsor model.apiToken jsSensor.id
-
-                cmd =
-                    Cmd.batch [ cmdSensorDetails, cmdSponsor ]
-            in
-            ( { model | selectedSensor = Models.SensorLoading }, cmd )
-
+        -- Sensor deselected
         SensorClicked Nothing ->
-            ( { model | selectedSensor = Models.SensorMissing }, Cmd.none )
+            ( { model | selectedSensor = Models.NoSensor }
+            , Nav.pushUrl model.key Routing.mapPath
+            )
+
+
+{-| Load sensor and sponsor details for the given sensor.
+-}
+loadSensor : Model -> Models.JsSensor -> Cmd Msg
+loadSensor model jsSensor =
+    let
+        -- Trigger loading of sensor details
+        cmdSensorDetails =
+            Api.loadSensorDetails model.apiToken jsSensor.id
+
+        -- Trigger loading of sponsor information
+        cmdSponsor =
+            Api.loadSponsor model.apiToken jsSensor.id
+    in
+    Cmd.batch [ cmdSensorDetails, cmdSponsor ]
 
 
 subscriptions : Model -> Sub Msg

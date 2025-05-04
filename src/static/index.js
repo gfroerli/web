@@ -8,6 +8,8 @@ const elmApp = entrypoint.Elm.Main.init({
     },
 });
 
+const ZOOM_LEVEL_DETAIL = 13;
+
 const initializeMap = (pos) => {
     console.info('Map: Initialize');
 
@@ -80,55 +82,79 @@ const initializeMap = (pos) => {
     */
 
     // When new sensors are loaded, display them
-    elmApp.ports.sensorsLoaded.subscribe(sensors => {
-        console.debug('Map:', sensors.length, 'new sensors have been loaded.');
+    elmApp.ports.sensorsLoaded.subscribe(
+        ([sensors, initiallySelectedSensor]) => {
+            console.debug(
+                `Map: ${sensors.length} new sensors have been loaded.`,
+            );
 
-        // Zoom to bounding box
-        const latitudes = sensors.map(s => s.pos.lat);
-        const longitudes = sensors.map(s => s.pos.lng);
-        const latMinMax = [Math.min(...latitudes), Math.max(...latitudes)];
-        const lngMinMax = [Math.min(...longitudes), Math.max(...longitudes)];
-        const latDelta = Math.max(0.01, latMinMax[1] - latMinMax[0]);
-        const lngDelta = Math.max(0.01, lngMinMax[1] - lngMinMax[0]);
-        map.fitBounds([[
-            lngMinMax[0] - lngDelta * 0.2,
-            latMinMax[0] - latDelta * 0.2,
-        ], [
-            lngMinMax[1] + lngDelta * 0.2,
-            latMinMax[1] + latDelta * 0.2,
-        ]]);
-
-        // Add marker for every sensor
-        sensors.forEach(sensor => {
-            // Create marker element
-            const el = document.createElement('div');
-            el.className = 'marker';
-            let text;
-            if (sensor.latestTemperature) {
-                const tempString = sensor.latestTemperature;
-                const tempFloat = parseFloat(tempString);
-                if (!!tempFloat) {
-                    text = document.createTextNode(Math.round(tempFloat));
-                } else {
-                    text = document.createTextNode('?');
-                }
-            } else {
-                text = document.createTextNode('?');
+            // Zoom to bounding box
+            if (!initiallySelectedSensor) {
+                const latitudes = sensors.map((s) => s.pos.lat);
+                const longitudes = sensors.map((s) => s.pos.lng);
+                const latMinMax = [
+                    Math.min(...latitudes),
+                    Math.max(...latitudes),
+                ];
+                const lngMinMax = [
+                    Math.min(...longitudes),
+                    Math.max(...longitudes),
+                ];
+                const latDelta = Math.max(0.01, latMinMax[1] - latMinMax[0]);
+                const lngDelta = Math.max(0.01, lngMinMax[1] - lngMinMax[0]);
+                map.fitBounds([
+                    [
+                        lngMinMax[0] - lngDelta * 0.2,
+                        latMinMax[0] - latDelta * 0.2,
+                    ],
+                    [
+                        lngMinMax[1] + lngDelta * 0.2,
+                        latMinMax[1] + latDelta * 0.2,
+                    ],
+                ]);
             }
-            el.appendChild(text);
 
-            // Add marker to map
-            const marker = new mapboxgl.Marker(el)
-                .setLngLat([sensor.pos.lng, sensor.pos.lat])
-                .addTo(map);
+            // Add marker for every sensor
+            for (const sensor of sensors) {
+                // Create marker element
+                const el = document.createElement("div");
+                el.className = "marker";
+                let text;
+                if (sensor.latestTemperature) {
+                    const tempString = sensor.latestTemperature;
+                    const tempFloat = parseFloat(tempString);
+                    if (!!tempFloat) {
+                        text = document.createTextNode(Math.round(tempFloat));
+                    } else {
+                        text = document.createTextNode("?");
+                    }
+                } else {
+                    text = document.createTextNode("?");
+                }
+                el.appendChild(text);
 
-            // Add event listener
-            el.addEventListener('click', (ev) => {
-                ev.stopPropagation();
-                selectSensor(sensor, el);
-            });
-        });
-    });
+                // Add marker to map
+                const marker = new mapboxgl.Marker(el)
+                    .setLngLat([sensor.pos.lng, sensor.pos.lat])
+                    .addTo(map);
+
+                // Add event listener
+                el.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    selectSensor(sensor, el);
+                });
+
+                // If specified, select initial sensor
+                if (
+                    initiallySelectedSensor &&
+                    sensor.id === initiallySelectedSensor.id
+                ) {
+                    selectSensor(sensor, el);
+                    map.flyTo({ center: sensor.pos, zoom: ZOOM_LEVEL_DETAIL });
+                }
+            }
+        },
+    );
 
     // When clicking on map, deselect all markers
     map.on('click', deselectSensor);
