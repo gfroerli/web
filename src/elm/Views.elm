@@ -207,6 +207,7 @@ aboutView =
             , p [] [ text "Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es keine verlässliche Methode, um Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten." ]
             , p [] [ text "Es gibt heute bereits ein paar Wassertemperatur-Sensor-Netzwerke, aber meistens gibt es nur einen Sensor pro See, wodurch lokale Temperaturunterschiede (z.B. an einer Flussmündung) ignoriert werden. Viele Sensoren werden zudem nur ein mal pro Tag publiziert." ]
             , p [] [ text "Wir bauen ein Netzwerk von kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf.  Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen." ]
+            , p [] [ text "Zusätzlich binden wir neben unseren eigenen Sensoren auch Fluss-Temperatur-Messungen des Bundesamts für Umwelt (BAFU) ein." ]
             , p []
                 [ text "Der Quellcode dieser Webapp steht unter einer freien Lizenz und kann "
                 , a [ href Routing.githubPath ] [ text "auf Github" ]
@@ -218,7 +219,7 @@ aboutView =
                 [ text "Mehr Informationen über uns findest du auf unserer Website: "
                 , a [ href Routing.coredumpPath ] [ text "www.coredump.ch" ]
                 ]
-            , h3 [ css [] ] [ text "Wie kann ich selber so einen Sensor platzieren?" ]
+            , h3 [ css [] ] [ text "Wie kann ich selber so einen Sensor platzieren oder Sensor-Sponsor werden?" ]
             , p []
                 [ text "Kontaktiere uns doch unter "
                 , a [ href "mailto:gfroerli@coredump.ch" ] [ text "gfroerli@coredump.ch" ]
@@ -278,7 +279,7 @@ mapView model =
         ("Finde die aktuelle und historische Wassertemperatur an "
             ++ (model.sensors |> List.length |> String.fromInt)
             ++ pluralize " Standort" " Standorten" (model.sensors |> List.length)
-            ++ " in verschiedenen Seen der Schweiz!"
+            ++ " in verschiedenen Seen und Flüssen der Schweiz!"
         )
         model.alerts
         [ div [ id "download-buttons", css [ position absolute, top (px 8), right (px 8) ] ]
