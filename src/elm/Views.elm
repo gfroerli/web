@@ -6,8 +6,9 @@ import Css exposing (..)
 import Css.Global as Global
 import Css.Media as Media
 import Helpers exposing (approximateTimeAgo, formatTemperature, posixTimeDeltaSeconds)
-import Html.Styled exposing (Attribute, Html, a, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
-import Html.Styled.Attributes exposing (alt, css, href, id, src, title)
+import Html.Styled exposing (Attribute, Html, a, button, div, footer, fromUnstyled, h1, h2, h3, img, li, p, span, text, toUnstyled, ul)
+import Html.Styled.Attributes exposing (alt, css, href, id, src, title, type_)
+import Html.Styled.Events exposing (onClick)
 import Material.Icons.Outlined as Outlined
 import Material.Icons.Types exposing (Coloring(..))
 import Messages exposing (..)
@@ -155,8 +156,38 @@ styleMessage alert =
                 , backgroundColor (hex "#c62828")
                 , textAlign center
                 , padding (px 8)
+                , displayFlex
+                , alignItems center
+                , justifyContent spaceBetween
                 ]
             ]
+
+
+{-| The "x" button to dismiss an alert.
+-}
+dismissButton : Int -> Html Msg
+dismissButton alertId =
+    button
+        [ type_ "button"
+        , onClick (DismissAlert alertId)
+        , css
+            [ displayFlex
+            , alignItems center
+            , justifyContent center
+            , width (px 24)
+            , height (px 24)
+            , padding (px 4)
+            , border (px 0)
+            , borderRadius (px 12)
+            , backgroundColor (rgba 255 255 255 0.2)
+            , color inherit
+            , lineHeight (num 1)
+            , cursor pointer
+            , hover [ backgroundColor (rgba 255 255 255 0.3) ]
+            , focus [ outline3 (px 2) solid (rgba 255 255 255 0.5) ]
+            ]
+        ]
+        [ fromUnstyled (Outlined.close 16 Inherit) ]
 
 
 {-| Alert messages shown to the user (e.g. errors)
@@ -167,8 +198,11 @@ alertMessages alerts =
         (List.map
             (\alert ->
                 p (styleMessage alert)
-                    [ span [ css [ fontWeight bold ] ] [ text "Fehler: " ]
-                    , text alert.message
+                    [ div [ css [ flexGrow (num 1) ] ]
+                        [ span [ css [ fontWeight bold ] ] [ text "Fehler: " ]
+                        , text alert.message
+                        ]
+                    , dismissButton alert.id
                     ]
             )
             alerts

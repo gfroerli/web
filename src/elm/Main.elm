@@ -3,6 +3,7 @@ module Main exposing (Flags, init, main, subscriptions, update)
 import Api
 import Browser
 import Browser.Navigation as Nav
+import Http
 import Map
 import MapPort
 import Messages exposing (..)
@@ -60,6 +61,7 @@ init flags url key =
       , apiToken = flags.apiToken
       , now = Nothing
       , alerts = []
+      , alertCounter = 1
       }
     , Cmd.batch
         -- Note: Initialize map only if needed. The TimeUpdate task on the other
@@ -197,6 +199,9 @@ update msg model =
         SponsorLoaded (Ok sponsor) ->
             ( { model | selectedSponsor = Models.SponsorLoaded sponsor }, Cmd.none )
 
+        SponsorLoaded (Err (Http.BadStatus 404)) ->
+            ( model, Cmd.none )
+
         SponsorLoaded (Err error) ->
             let
                 alertMsg =
@@ -280,6 +285,10 @@ update msg model =
             ( { model | selectedSensor = Models.NoSensor }
             , Nav.pushUrl model.key Routing.mapPath
             )
+
+        -- The cross button on an alert was clicked
+        DismissAlert alertId ->
+            ( Models.dismissAlert model alertId, Cmd.none )
 
 
 {-| Load sensor and sponsor details for the given sensor.

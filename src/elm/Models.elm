@@ -10,6 +10,7 @@ module Models exposing
     , Severity(..)
     , Sponsor
     , addErrorAlert
+    , dismissAlert
     , findJsSensorWithId
     )
 
@@ -25,7 +26,8 @@ type Severity
 
 
 type alias Alert =
-    { severity : Severity
+    { id : Int
+    , severity : Severity
     , message : String
     }
 
@@ -48,11 +50,19 @@ addErrorAlert : Model -> String -> Model
 addErrorAlert model msg =
     let
         alert =
-            { severity = Error
+            { id = model.alertCounter
+            , severity = Error
             , message = msg
             }
     in
-    { model | alerts = alert :: model.alerts }
+    { model | alerts = alert :: model.alerts, alertCounter = model.alertCounter + 1 }
+
+
+{-| Remove an alert by its ID.
+-}
+dismissAlert : Model -> Int -> Model
+dismissAlert model alertId =
+    { model | alerts = List.filter (\alert -> alert.id /= alertId) model.alerts }
 
 
 type alias Model =
@@ -66,6 +76,7 @@ type alias Model =
     , apiToken : String
     , now : Maybe Time.Posix
     , alerts : List Alert
+    , alertCounter : Int
     }
 
 

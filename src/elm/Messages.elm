@@ -20,3 +20,4 @@ type Msg
     | TimeUpdate Time.Posix
     | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | DismissAlert Int
