@@ -3,6 +3,7 @@ module Main exposing (Flags, init, main, subscriptions, update)
 import Api
 import Browser
 import Browser.Navigation as Nav
+import Http
 import Map
 import MapPort
 import Messages exposing (..)
@@ -197,6 +198,9 @@ update msg model =
 
         SponsorLoaded (Ok sponsor) ->
             ( { model | selectedSponsor = Models.SponsorLoaded sponsor }, Cmd.none )
+
+        SponsorLoaded (Err (Http.BadStatus 404)) ->
+            ( model, Cmd.none )
 
         SponsorLoaded (Err error) ->
             let
