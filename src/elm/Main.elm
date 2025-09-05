@@ -200,15 +200,18 @@ update msg model =
             ( { model | selectedSponsor = Models.SponsorLoaded sponsor }, Cmd.none )
 
         SponsorLoaded (Err (Http.BadStatus 404)) ->
-            ( model, Cmd.none )
+            ( { model | selectedSponsor = Models.NoSponsor }, Cmd.none )
 
         SponsorLoaded (Err error) ->
             let
                 alertMsg =
                     "Sponsor-Daten für Sensor  konnten nicht geladen werden: "
                         ++ Api.errorToString error
+
+                modelWithAlert =
+                    Models.addErrorAlert model alertMsg
             in
-            ( Models.addErrorAlert model alertMsg, Cmd.none )
+            ( { modelWithAlert | selectedSponsor = Models.NoSponsor }, Cmd.none )
 
         MeasurementsLoaded ( sensorId, Ok measurements ) ->
             let
