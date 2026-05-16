@@ -75,7 +75,7 @@ Upgrading Elm dependencies can be done using a few helpers installed through npm
 
 ## License
 
-Copyright © 2017–2025 Coredump Hackerspace.
+Copyright © 2017–2026 Coredump Hackerspace.
 
 Licensed under the AGPLv3 or later, see `LICENSE.md`.
 
